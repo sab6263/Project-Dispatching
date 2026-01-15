@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CADProvider } from './context/CADContext';
 import { Sidebar } from './components/Sidebar';
 import { Layout } from './components/Layout';
@@ -12,6 +12,33 @@ import { MapView } from './components/map/MapView';
 
 function App() {
   const [activeWorkspace, setActiveWorkspace] = useState<'A' | 'B' | 'C' | 'D'>('A');
+  const [isDetached, setIsDetached] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const workspaceParam = params.get('workspace') as 'A' | 'B' | 'C' | 'D';
+    const detachedParam = params.get('detached') === 'true';
+
+    if (workspaceParam) {
+      setActiveWorkspace(workspaceParam);
+    }
+    if (detachedParam) {
+      setIsDetached(true);
+    }
+  }, []);
+
+  if (isDetached) {
+    return (
+      <CADProvider>
+        <div className="w-screen h-screen bg-[#0f172a] text-white overflow-hidden">
+          {activeWorkspace === 'A' && <CallTakingView />}
+          {activeWorkspace === 'B' && <SituationalAwarenessView />}
+          {activeWorkspace === 'C' && <DispatchingView />}
+          {activeWorkspace === 'D' && <MapView />}
+        </div>
+      </CADProvider>
+    );
+  }
 
   return (
     <CADProvider>

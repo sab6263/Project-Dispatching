@@ -48,29 +48,21 @@ const GetIcon = (type: string, category?: string, label?: string) => {
     let borderWidth = '3px';
 
     if (type === 'Hospital') {
-        content = (
-            <div style={{
-                width: '26px',
-                height: '26px',
-                backgroundColor: '#ef4444',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Plus size={18} color="white" strokeWidth={4} />
-            </div>
-        );
-        bgColor = 'white';
-        borderColor = '#ef4444';
+        bgColor = '#ef4444';
+        borderColor = 'rgba(255, 255, 255, 0.8)';
+        textColor = 'rgba(255, 255, 255, 0.9)';
+        borderRadius = '8px';
+        size = 40;
+        borderWidth = '2px';
+        content = <Plus size={22} strokeWidth={4} />;
     } else if (type === 'Station') {
         bgColor = '#475569';
         borderColor = 'rgba(255, 255, 255, 0.8)';
         textColor = 'rgba(255, 255, 255, 0.9)';
         borderRadius = '8px';
-        size = 32;
+        size = 40;
         borderWidth = '2px';
-        content = <Building2 size={18} strokeWidth={2} />;
+        content = <Building2 size={22} strokeWidth={2} />;
     } else if (type === 'Vehicle') {
         const text = label || '?';
         content = <div style={{
@@ -263,7 +255,7 @@ const RoutingMachine = ({ from, to, setRouteMetrics }: { from: [number, number],
                 map.removeControl(routingControlRef.current);
             }
         };
-    }, [from, to, map, setRouteMetrics]);
+    }, [from[0], from[1], to[0], to[1], map]); // Removed setRouteMetrics from dependency to avoid loop if it's unstable, and used primitives for coords
 
     return (
         <>
