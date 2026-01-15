@@ -12,32 +12,13 @@ export const useMapSimulation = () => {
             // 1. Vehicle Simulation
             setVehicles(currentVehicles =>
                 currentVehicles.map(v => {
-                    // Simulate random movement (jitter) if status is 'In Transit' or just generally for live feel if desired,
-                    // but original logic was specifically checking for 'In Transit' or general update?
-                    // Original: "if (v.status === 'In Transit')" logic was actually commenting it out or not fully implemented in the snippet provided?
-                    // Let's re-read the original snippet:
-                    /*
-                    if (v.status === 'In Transit') {
-                        newPos = [ ... ]
-                    }
-                    */
-                    // Wait, original snippet had specific logic.
-                    // Actually, let's just apply jitter to dispatched vehicles to make it alive.
-                    let newPos = [...v.position] as [number, number];
-                    if (v.status === 'Dispatched' || v.status === 'Returning' || v.status === 'In Transit') {
-                        newPos = [
-                            v.position[0] + (Math.random() - 0.5) * 0.0005,
-                            v.position[1] + (Math.random() - 0.5) * 0.0005
-                        ];
-                    }
-
                     // Simulate fuel consumption
                     let newFuel = v.fuel;
                     if (v.status !== 'Available' && Math.random() > 0.7) {
                         newFuel = Math.max(0, v.fuel - 1);
                     }
 
-                    return { ...v, position: newPos, fuel: newFuel };
+                    return { ...v, fuel: newFuel };
                 })
             );
 

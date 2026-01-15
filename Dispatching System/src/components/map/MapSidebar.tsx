@@ -193,6 +193,27 @@ const VehicleDetails = ({ vehicle, routeMetrics, stations }: any) => {
 
     const displayTime = (routeMetrics || useStationRouting) ? (estimatedReadyTime + totalDriveTime) : '--';
 
+    // Logic to handle timeline for Returning vehicles
+    let displayMission = vehicle.mission;
+    if (isReturning) {
+        if (!displayMission) {
+            // If no previous mission data, create a placeholder
+            displayMission = {
+                keyword: 'Return Trip',
+                description: 'Unit returning to station',
+                timeline: []
+            };
+        }
+        // Create a new timeline array to avoid mutating the original
+        const returningEvent = { time: 'Now', event: 'Returning to Base' };
+        // We want 'Returning to Base' to be the *last* event chronologically, 
+        // which becomes the *first* event when reversed in the UI loop.
+        displayMission = {
+            ...displayMission,
+            timeline: [...displayMission.timeline, returningEvent]
+        };
+    }
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px' }}>
@@ -251,8 +272,8 @@ const VehicleDetails = ({ vehicle, routeMetrics, stations }: any) => {
                         <span style={{ color: '#cbd5e1' }}>{baseDriveTime} min</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                        <span style={{ color: '#3b82f6' }}>Traffic Delay</span>
-                        <span style={{ color: '#3b82f6' }}>+ {trafficDelay} min</span>
+                        <span style={{ color: '#cbd5e1' }}>Traffic Delay</span>
+                        <span style={{ color: '#cbd5e1' }}>+ {trafficDelay} min</span>
                     </div>
                 </div>
 
@@ -286,29 +307,46 @@ const VehicleDetails = ({ vehicle, routeMetrics, stations }: any) => {
                 </div>
             </div>
 
-            {vehicle.mission && (
+            {displayMission && (
                 <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px' }}>
                     <div style={{ marginBottom: '20px', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         CURRENT MISSION TIMELINE
                     </div>
                     <div style={{ position: 'relative', paddingLeft: '12px' }}>
-                        <div style={{
-                            position: 'absolute',
-                            left: '7px',
-                            top: '8px',
-                            bottom: '24px',
-                            width: '2px',
-                            background: '#334155',
-                            zIndex: 0
-                        }} />
-                        {[...vehicle.mission.timeline].reverse().map((event: any, idx: number) => {
+                        {[...displayMission.timeline].reverse().map((event: any, idx: number, arr: any[]) => {
                             const isLatest = idx === 0;
+                            const isLast = idx === arr.length - 1;
+
                             return (
-                                <div key={idx} style={{ marginBottom: '24px', position: 'relative', paddingLeft: '24px' }}>
+                                <div key={idx} style={{ marginBottom: isLast ? '0px' : '24px', position: 'relative', paddingLeft: '24px' }}>
+                                    {/* Timeline Line Segment */}
+                                    {!isLast && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            left: '7px',
+                                            top: isLatest ? '32px' : '0px',
+                                            bottom: '-24px',
+                                            width: '2px',
+                                            background: '#334155',
+                                            zIndex: 0
+                                        }} />
+                                    )}
+                                    {isLast && !isLatest && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            left: '7px',
+                                            top: '0px',
+                                            height: '32px',
+                                            width: '2px',
+                                            background: '#334155',
+                                            zIndex: 0
+                                        }} />
+                                    )}
+
                                     <div style={{
                                         position: 'absolute',
                                         left: '0px',
-                                        top: '6px',
+                                        top: isLatest ? '24px' : '26px',
                                         width: isLatest ? '16px' : '12px',
                                         height: isLatest ? '16px' : '12px',
                                         borderRadius: '50%',
@@ -321,8 +359,13 @@ const VehicleDetails = ({ vehicle, routeMetrics, stations }: any) => {
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         <span style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '2px' }}>{event.time}</span>
                                         <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'white' }}>
-                                            {event.event.includes('Dispatched:') ? 'Dispatched' : event.event}
+                                            {event.event.replace(/:.+/, '')} {/* Strip existing keyword from event string if present to avoid duplication */}
                                         </span>
+                                        {event.event.includes('Dispatched') && displayMission.keyword && (
+                                            <span style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px', fontStyle: 'italic' }}>
+                                                Keyword: {displayMission.keyword}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             );
