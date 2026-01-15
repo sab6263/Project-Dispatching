@@ -3,6 +3,77 @@ import { useCAD } from '../../context/CADContext';
 import { User, MapPin, Phone, AlertCircle, Calendar, Sparkles, UserPlus, Info, Tag, X, Flame, Ambulance, Plus } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+// --- Extracted Component ---
+interface MagicInputProps {
+    label: string;
+    icon?: any;
+    field: string;
+    value: any;
+    placeholder?: string;
+    half?: boolean;
+    onHoverField?: string;
+    overrideChange?: (value: string) => void;
+    aiFilledFields: Record<string, boolean>;
+    onChange: (field: string, value: any) => void;
+    onFocus: (field: string) => void;
+    onBlur: () => void;
+    onDrop: (e: React.DragEvent, field: string) => void;
+}
+
+const MagicInput = ({ label, icon: Icon, field, value, placeholder, half = false, onHoverField, overrideChange, aiFilledFields, onChange, onFocus, onBlur, onDrop }: MagicInputProps) => {
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        const target = e.currentTarget as HTMLElement;
+        target.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        const target = e.currentTarget as HTMLElement;
+        target.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    return (
+        <div
+            className={cn("space-y-1 relative group transition-all duration-300 rounded-lg", half ? "col-span-1" : "col-span-2")}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={(e) => onDrop(e, field)}
+        >
+            <div className="flex justify-between px-1">
+                <label className="text-xs font-medium text-textMuted flex items-center gap-1.5 uppercase tracking-wide">
+                    {Icon && <Icon className="w-3 h-3 text-textMuted" />}
+                    {label}
+                </label>
+                {aiFilledFields[field] && (
+                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 shadow-sm animate-in zoom-in">
+                        <Sparkles className="w-2.5 h-2.5" /> AI-Sourced
+                    </span>
+                )}
+            </div>
+            <div className="relative">
+                <input
+                    type="text"
+                    className={cn(
+                        "w-full bg-surface border rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600",
+                        aiFilledFields[field] ? "border-purple-500/40 shadow-[0_0_15px_-5px_rgba(168,85,247,0.3)]" : "border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/50"
+                    )}
+                    placeholder={placeholder}
+                    value={value || ''}
+                    onChange={(e) => overrideChange ? overrideChange(e.target.value) : onChange(field, e.target.value)}
+                    onMouseEnter={() => onFocus(onHoverField || field)}
+                    onMouseLeave={onBlur}
+                />
+            </div>
+        </div>
+    );
+};
+
 export const IntakeForm: React.FC = () => {
     const { activeCall, setActiveCall, setActiveTranscriptHighlight } = useCAD();
     const [activeTab, setActiveTab] = useState<'emergency' | 'scheduled'>('emergency');
@@ -22,6 +93,11 @@ export const IntakeForm: React.FC = () => {
     });
 
     const handleChange = (field: string, value: any) => {
+        // Clear AI Sourced tag if user manually edits
+        if (aiFilledFields[field]) {
+            setAiFilledFields(prev => ({ ...prev, [field]: false }));
+        }
+
         const newState = { ...activeCall, [field]: value };
 
         // Improved Mock Auto-Fill Logic
@@ -126,41 +202,16 @@ export const IntakeForm: React.FC = () => {
 
     // --- COMPONENTS ---
 
-    const MagicInput = ({ label, icon: Icon, field, value, placeholder, half = false, onHoverField, overrideChange }: any) => (
-        <div
-            className={cn("space-y-1 relative group transition-all duration-300 rounded-lg", half ? "col-span-1" : "col-span-2")}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, field)}
-        >
-            <div className="flex justify-between px-1">
-                <label className="text-xs font-medium text-textMuted flex items-center gap-1.5 uppercase tracking-wide">
-                    {Icon && <Icon className="w-3 h-3 text-textMuted" />}
-                    {label}
-                </label>
-                {aiFilledFields[field] && (
-                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 shadow-sm animate-in zoom-in">
-                        <Sparkles className="w-2.5 h-2.5" /> AI-Sourced
-                    </span>
-                )}
-            </div>
-            <div className="relative">
-                <input
-                    type="text"
-                    className={cn(
-                        "w-full bg-surface border rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600",
-                        aiFilledFields[field] ? "border-purple-500/40 shadow-[0_0_15px_-5px_rgba(168,85,247,0.3)]" : "border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/50"
-                    )}
-                    placeholder={placeholder}
-                    value={value || ''}
-                    onChange={(e) => overrideChange ? overrideChange(e.target.value) : handleChange(field, e.target.value)}
-                    onMouseEnter={() => handleFocus(onHoverField || field)}
-                    onMouseLeave={handleBlur}
-                />
-            </div>
-        </div>
-    );
+    // --- COMPONENTS ---
+
+    // Simplification for props
+    const commonInputProps = {
+        aiFilledFields,
+        onChange: handleChange,
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+        onDrop: handleDrop
+    };
 
     return (
         <div className="h-full flex flex-col gap-4 overflow-visible"> {/** Changed overflow-hidden to visible for dropdowns */}
@@ -195,8 +246,8 @@ export const IntakeForm: React.FC = () => {
                         <User className="w-3.5 h-3.5" /> Caller Information
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <MagicInput label="Name" field="callerName" value={activeCall.callerName} placeholder="Lastname, Firstname" half />
-                        <MagicInput label="Callback Number" field="callerPhone" icon={Phone} value={activeCall.callerPhone} placeholder="+1 ..." half />
+                        <MagicInput label="Name" field="callerName" value={activeCall.callerName} placeholder="Lastname, Firstname" half {...commonInputProps} />
+                        <MagicInput label="Callback Number" field="callerPhone" icon={Phone} value={activeCall.callerPhone} placeholder="+1 ..." half {...commonInputProps} />
                     </div>
                 </div>
 
@@ -207,13 +258,13 @@ export const IntakeForm: React.FC = () => {
                             <UserPlus className="w-3.5 h-3.5" /> Patient Details
                         </h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <MagicInput label="Patient Name" field="patientName" value={activeCall['patientName' as keyof typeof activeCall]} placeholder="If different..." />
+                            <MagicInput label="Patient Name" field="patientName" value={activeCall['patientName' as keyof typeof activeCall]} placeholder="If different..." {...commonInputProps} />
                             <MagicInput
                                 label="Transport Type"
                                 field="transportType"
                                 value={activeCall['transportType' as keyof typeof activeCall]}
                                 placeholder="e.g. Wheelchair, Stretcher..."
-                                overrideChange={(val: string) => setActiveCall(prev => ({ ...prev, transportType: val }))}
+                                {...commonInputProps}
                             />
                         </div>
                     </div>
@@ -225,15 +276,15 @@ export const IntakeForm: React.FC = () => {
                         <MapPin className="w-3.5 h-3.5" /> Incident Location
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <MagicInput label="Street / Object" field="location" value={activeCall.location} placeholder="123 Main St" onHoverField="location" />
+                        <MagicInput label="Street / Object" field="location" value={activeCall.location} placeholder="123 Main St" onHoverField="location" {...commonInputProps} />
 
                         <div className="grid grid-cols-3 gap-2 col-span-2">
-                            <MagicInput label="Zip Code" field="zip" value={activeCall['zip' as keyof typeof activeCall]} placeholder="10..." half />
-                            <MagicInput label="City" field="city" value={activeCall['city' as keyof typeof activeCall]} placeholder="City" half />
-                            <MagicInput label="District" field="district" value={activeCall['district' as keyof typeof activeCall]} placeholder="Area" half />
+                            <MagicInput label="Zip Code" field="zip" value={activeCall['zip' as keyof typeof activeCall]} placeholder="10..." half {...commonInputProps} />
+                            <MagicInput label="City" field="city" value={activeCall['city' as keyof typeof activeCall]} placeholder="City" half {...commonInputProps} />
+                            <MagicInput label="District" field="district" value={activeCall['district' as keyof typeof activeCall]} placeholder="Area" half {...commonInputProps} />
                         </div>
 
-                        <MagicInput label="Floor / Access Details" field="floor" value={activeCall['floor' as keyof typeof activeCall]} placeholder="3rd Floor, Code 1234..." />
+                        <MagicInput label="Floor / Access Details" field="floor" value={activeCall['floor' as keyof typeof activeCall]} placeholder="3rd Floor, Code 1234..." {...commonInputProps} />
                     </div>
                 </div>
 
