@@ -277,8 +277,8 @@ export const MapComponent: React.FC<MapComponentProps> = ({ hospitals, vehicles,
     const showRoute = selectedItem?.type === 'Vehicle' && targetIncident;
 
     return (
-        <div className="map-wrapper" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
-            <MapContainer center={center} zoom={13} style={{ width: '100%', height: '100%' }} zoomControl={false}>
+        <div className="map-wrapper" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, backgroundColor: '#0e0e0e' }}>
+            <MapContainer center={center} zoom={13} style={{ width: '100%', height: '100%', backgroundColor: '#0e0e0e' }} zoomControl={false}>
                 <TileLayer
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                     attribution='&copy; <a href="https://carto.com/">CARTO</a> | Routing by OSRM'
