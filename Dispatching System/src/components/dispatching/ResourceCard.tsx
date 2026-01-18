@@ -24,28 +24,28 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ id, type, callsign, 
         <div
             onClick={onClick}
             className={`
-                glass-panel rounded-xl p-4 cursor-pointer transition-all duration-300
-                hover:bg-white/5 hover:scale-[1.02]
+                glass-panel rounded-xl p-6 cursor-pointer transition-all duration-300
+                hover:bg-white/5 hover:scale-[1.01]
                 ${isSelected ? 'ring-2 ring-primary bg-primary/10' : ''}
             `}
         >
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className={`p-3 rounded-full bg-white/5 ${isSelected ? 'text-primary' : 'text-textMuted'}`}>
-                        {type === 'RTW' ? <Ambulance className="w-6 h-6" /> : <Truck className="w-6 h-6" />}
+                <div className="flex items-center gap-5">
+                    <div className={`p-4 rounded-full bg-white/5 ${isSelected ? 'text-primary' : 'text-textMuted'}`}>
+                        {type === 'RTW' ? <Ambulance className="w-8 h-8" /> : <Truck className="w-8 h-8" />}
                     </div>
                     <div>
-                        <h4 className="font-bold text-lg text-white">{callsign}</h4>
-                        <div className="flex items-center gap-2 text-xs text-textMuted uppercase tracking-wider">
-                            <span>{type}</span>
+                        <h4 className="font-bold text-2xl text-white mb-1">{callsign}</h4>
+                        <div className="flex items-center gap-3 text-sm text-textMuted uppercase tracking-wider">
+                            <span className="font-bold">{type}</span>
                             <span>•</span>
-                            <span className="text-white font-mono">{eta}</span>
+                            <span className="text-white font-mono text-base">{eta}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className={`
-                    relative w-12 h-12 flex items-center justify-center rounded-full border-4 font-bold text-sm
+                    relative w-16 h-16 flex items-center justify-center rounded-full border-[5px] font-bold text-xl
                     ${getScoreColor(matchScore)}
                 `}>
                     {matchScore}%
