@@ -253,7 +253,7 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
             <div
                 className="w-full overflow-y-auto p-4 space-y-4 scroll-smooth border-t border-white/5 bg-black/20"
                 ref={scrollRef}
-                style={{ height: '800px', flex: 'none' }} // Strict Flex None to prevent expansion
+                style={{ height: '30vh', flex: 'none' }} // Fixed height as requested
             >
                 {lines.map((line, idx) => {
                     const isCaller = idx % 2 !== 0;

@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .glass-panel {
+    @apply bg-surfaceGlass backdrop-blur-md border border-glassBorder shadow-lg;
+  }
+}
+
 @layer base {
   body {
     @apply bg-background text-textMain antialiased;

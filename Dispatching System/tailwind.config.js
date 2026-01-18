@@ -12,6 +12,9 @@ export default {
         background: '#0a0a0a',
         surface: '#1a1a1a',
         surfaceHighlight: '#2a2a2a',
+        surfaceGlass: 'rgba(26, 26, 26, 0.6)', // Semi-transparent surface
+        border: '#333333',
+        glassBorder: 'rgba(255, 255, 255, 0.1)', // Glass border
         border: '#333333',
         primary: '#3b82f6', // Bright Blue for active elements
         danger: '#ef4444', // Red for alerts
