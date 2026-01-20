@@ -27,10 +27,10 @@ export const CallTakingView: React.FC = () => {
 
         if (transcriptPanel && formPanel && dispatchPanel) {
             if (isFocusMode) {
-                // Focus Mode: Expand Dispatch to 50%, Shrink others
-                transcriptPanel.resize(20);
+                // Focus Mode: Expand Dispatch to 55-60%, Shrink others proportionally
+                transcriptPanel.resize(15);
                 formPanel.resize(30);
-                dispatchPanel.resize(50);
+                dispatchPanel.resize(55);
             } else {
                 // Default Mode: Balanced
                 transcriptPanel.resize(30);
@@ -51,7 +51,7 @@ export const CallTakingView: React.FC = () => {
                         ref={transcriptPanelRef}
                         defaultSize={isDispatchReady ? 30 : 55}
                         minSize={15}
-                        className="p-4 pr-2 transition-all duration-300 ease-in-out h-full flex flex-col overflow-hidden"
+                        className="p-4 pr-2 transition-all duration-400 ease-in-out h-full flex flex-col overflow-hidden"
                     >
                         <LiveTranscript />
                     </Panel>
@@ -65,7 +65,7 @@ export const CallTakingView: React.FC = () => {
                         ref={formPanelRef}
                         defaultSize={45}
                         minSize={30}
-                        className="p-4 px-2 transition-all duration-300 ease-in-out"
+                        className="p-4 px-2 transition-all duration-400 ease-in-out"
                     >
                         <IntakeForm />
                     </Panel>
@@ -81,9 +81,9 @@ export const CallTakingView: React.FC = () => {
                             ref={dispatchPanelRef}
                             defaultSize={25}
                             minSize={20}
-                            className="p-4 pl-2 h-full flex flex-col overflow-hidden animate-in slide-in-from-right duration-500 transition-all duration-300 ease-in-out"
+                            className="p-4 pl-2 h-full flex flex-col overflow-hidden animate-in slide-in-from-right duration-500 transition-all duration-400 ease-in-out"
                         >
-                            <DispatchRecommendation onSelectionChange={setIsFocusMode} />
+                            <DispatchRecommendation onFocusModeChange={setIsFocusMode} />
                         </Panel>
                     )}
                 </PanelGroup>

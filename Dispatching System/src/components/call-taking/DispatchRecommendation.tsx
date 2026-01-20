@@ -28,62 +28,43 @@ const MOCK_RECOMMENDATIONS = [
     },
 ] as const;
 
-export const DispatchRecommendation: React.FC<{ onSelectionChange?: (isSelected: boolean) => void }> = ({ onSelectionChange }) => {
+import { ProtocolCompliance } from '../dispatching/ProtocolCompliance';
+
+// ... (MOCKDATA remains same)
+
+export const DispatchRecommendation: React.FC<{ onFocusModeChange: (isFocus: boolean) => void }> = ({ onFocusModeChange }) => {
     const { activeCall } = useCAD();
     const [selectedResource, setSelectedResource] = useState<any>(null);
-    const [isVisible, setIsVisible] = useState(false);
+    // const [isVisible, setIsVisible] = useState(false); // Unused
 
-    // Initial State: Only show if data is sufficient (Validation Check)
-    useEffect(() => {
-        // Strict Validation: Need Location and Code to show proposal
-        if (activeCall.location && activeCall.location.length > 3 && activeCall.code) {
-            // Simulate "Proposing..." delay
-            setTimeout(() => setIsVisible(true), 1000);
-        } else {
-            setIsVisible(false);
-        }
-    }, [activeCall.location, activeCall.code]);
+    // State for List of Resources (to allow toggling selection for dispatch)
+    // Initialize with all true
+    const [resources, setResources] = useState(
+        MOCK_RECOMMENDATIONS.map(r => ({ ...r, isSelectedForDispatch: true }))
+    );
 
-    // Notify parent of selection change
-    useEffect(() => {
-        onSelectionChange?.(!!selectedResource);
-    }, [selectedResource, onSelectionChange]);
+    // Mock Requirements based on Call Code
+    // In a real app, this would come from the backend based on 'B3', 'F2' etc.
+    const REQUIRED_CATEGORIES = ['RTW', 'NEF', 'HLF'];
 
-    if (!isVisible) {
-        return (
-            <div className="h-full flex flex-col items-center justify-center p-6 text-center opacity-40 border border-white/5 bg-white/5 rounded-xl border-dashed">
-                <AlertTriangle className="w-10 h-10 mb-4 text-textMuted" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Awaiting Data</h3>
-                <p className="text-xs text-textMuted mt-2">Please enter location and classification to generate dispatch proposals.</p>
-            </div>
-        );
-    }
+    const handleToggleResource = (id: string) => {
+        setResources(prev => prev.map(res =>
+            res.id === id
+                ? { ...res, isSelectedForDispatch: !res.isSelectedForDispatch }
+                : res
+        ));
+    };
 
-    // View Switching: Detailed View (In-Place)
+    // Strict Component Swapping Logic (State B)
     if (selectedResource) {
         return (
-            <div className="h-full w-full bg-transparent flex flex-col gap-4 relative animate-in slide-in-from-right duration-300">
-                <div className="flex items-center gap-2 mb-2">
-                    <button
-                        onClick={() => setSelectedResource(null)}
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center gap-2 text-sm font-bold text-textMuted hover:text-white uppercase tracking-wider"
-                    >
-                        <ArrowLeft className="w-4 h-4" /> Back to Proposals
-                    </button>
-                </div>
-
-                {/* Reuse Detail Component but embedded */}
-                <div className="flex-1 relative">
-                    <ResourceDetailModal
-                        resource={selectedResource}
-                        isOpen={true}
-                        onClose={() => setSelectedResource(null)}
-                        // We might need to adjust styles since it was a modal before, 
-                        // but user asked for "replace the Disposition Proposal view".
-                        // Use inline style override to make it fit container if needed.
-                        isInline={true}
-                    />
-                </div>
+            <div className="h-full w-full bg-transparent animate-in slide-in-from-right duration-300">
+                <ResourceDetailModal
+                    resource={selectedResource}
+                    isOpen={true}
+                    onClose={() => setSelectedResource(null)}
+                    isInline={true}
+                />
             </div>
         );
     }
@@ -91,31 +72,47 @@ export const DispatchRecommendation: React.FC<{ onSelectionChange?: (isSelected:
     return (
         <div className="h-full w-full bg-transparent flex flex-col gap-4 relative overflow-hidden animate-in fade-in">
 
-            {/* Header: Simplified as requested */}
-            <div className="shrink-0 flex items-center justify-between py-2 border-b border-white/5">
-                <div>
-                    <h2 className="text-xl font-black text-white tracking-tight uppercase flex items-center gap-3">
-                        <span className="text-red-500">{activeCall.code || "F2"}</span>
-                        <span>{activeCall.keyword ? activeCall.keyword.split(',')[0] : "Housing Fire"}</span>
-                    </h2>
-                    <div className="text-xs text-textMuted uppercase tracking-widest mt-1">
-                        {activeCall.keyword || "Smoke • Person in Danger • 3rd Floor"}
+            {/* Header */}
+            <div className="shrink-0 flex flex-col border-b border-white/5 pb-2">
+                <div className="flex items-center justify-between py-2">
+                    <div>
+                        <h2 className="text-xl font-black text-white tracking-tight uppercase flex items-center gap-3">
+                            <span className="text-red-500">{activeCall.code || "F2"}</span>
+                            <span>{activeCall.keyword ? activeCall.keyword.split(',')[0] : "Housing Fire"}</span>
+                        </h2>
+                        <div className="text-xs text-textMuted uppercase tracking-widest mt-1">
+                            {activeCall.keyword || "Smoke • Person in Danger • 3rd Floor"}
+                        </div>
+                    </div>
+                    <div className="px-3 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wide flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Auto-Dispatch Ready
                     </div>
                 </div>
-                <div className="px-3 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wide flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Auto-Dispatch Ready
+
+                {/* Protocol Compliance Widget - Encapsulated */}
+                <div className="mt-2 bg-white/5 border border-white/10 rounded-lg p-3">
+                    <ProtocolCompliance
+                        requiredCategories={REQUIRED_CATEGORIES}
+                        selectedResources={resources}
+                    />
                 </div>
             </div>
 
             {/* Main Content: Larger Cards List */}
             <div className="flex-1 overflow-y-auto -mx-2 px-2 space-y-4 pt-2 pb-20"> {/* pb-20 for footer space */}
-                {MOCK_RECOMMENDATIONS.map(res => (
+                {resources.map(res => (
                     <ResourceCard
                         key={res.id}
                         {...res}
                         isSelected={selectedResource?.id === res.id}
-                        onClick={() => setSelectedResource(res)}
+                        onClick={() => {
+                            setSelectedResource(res);
+                            onFocusModeChange(true);
+                        }}
+                        // Pass Dispatch Selection Props
+                        isSelectedForDispatch={res.isSelectedForDispatch}
+                        onToggleSelection={() => handleToggleResource(res.id)}
                     />
                 ))}
             </div>

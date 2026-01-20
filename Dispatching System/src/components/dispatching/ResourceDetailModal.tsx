@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle, AlertTriangle, Battery, Gauge, MapPin, Clock } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, Battery, Gauge, MapPin, Clock, ArrowLeft } from 'lucide-react';
 import { ResourceCard } from './ResourceCard';
 
 interface ResourceDetailModalProps {
@@ -14,148 +14,207 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({ resour
 
     const Container = 'div';
     const containerClasses = isInline
-        ? "w-full h-full"
+        ? "w-full h-full bg-background" // Ensure bg is opaque
         : "absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200";
 
     const panelClasses = isInline
-        ? "glass-panel w-full h-full rounded-2xl flex overflow-hidden shadow-none ring-1 ring-white/10 flex-col md:flex-row"
-        : "glass-panel w-full max-w-5xl h-[85vh] rounded-2xl flex overflow-hidden shadow-2xl ring-1 ring-white/10";
-
-    const paddingClass = isInline ? "p-6 gap-5" : "p-8 gap-6"; // Medium Density: p-6
-    const headerTitleClass = isInline ? "text-3xl" : "text-5xl"; // Medium Density: 3xl
-    const statGridClass = isInline ? "grid-cols-3 gap-3" : "grid-cols-3 gap-4";
-    const statBoxClass = isInline ? "p-3" : "p-4";
+        ? "w-full h-full flex flex-col p-4 gap-4"
+        : "glass-panel w-full max-w-5xl h-[85vh] rounded-2xl flex flex-col p-6 gap-6 shadow-2xl ring-1 ring-white/10";
 
     return (
         <Container className={containerClasses}>
             <div className={panelClasses}>
 
-                {/* Main Content (Left) */}
-                <div className={`flex-1 ${paddingClass} flex flex-col overflow-y-auto`}>
-
-                    {/* Header: Compact for Inline */}
-                    <div className="flex justify-between items-start shrink-0">
-                        <div>
-                            <div className="text-xs font-mono text-textMuted uppercase tracking-widest mb-1">Primary Option</div>
-                            <h1 className={`font-black text-white tracking-tight ${headerTitleClass}`}>{resource.callsign}</h1>
-                            <div className="flex gap-4 text-sm text-textMuted mt-1">
-                                <span className="flex items-center gap-1"><Battery className="w-4 h-4" /> 22%</span>
-                                <span className="flex items-center gap-1 text-green-400"><CheckCircle className="w-4 h-4" /> Operational</span>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <div className={`${isInline ? "text-3xl" : "text-4xl"} font-bold text-white`}>{resource.eta}</div>
-                            <div className={`font-bold ${resource.matchScore > 90 ? "text-green-500" : "text-yellow-500"}`}>
-                                {resource.matchScore}% <span className="text-xs text-textMuted font-normal uppercase tracking-wider">Confidence</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Status Bars: Medium Density */}
-                    <div className={`grid ${statGridClass} shrink-0`}>
-                        <div className={`bg-surfaceHighlight/50 ${statBoxClass} rounded-lg border border-white/5`}>
-                            <div className="flex justify-between text-xs font-bold uppercase text-textMuted mb-2">
-                                <span>Route</span>
-                                <span className="text-green-400">Stable</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 w-[90%] rounded-full" />
-                            </div>
-                        </div>
-                        <div className={`bg-surfaceHighlight/50 ${statBoxClass} rounded-lg border border-white/5`}>
-                            <div className="flex justify-between text-xs font-bold uppercase text-textMuted mb-2">
-                                <span>Equip</span>
-                                <span className="text-red-400">Missing</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-red-500 w-[40%] rounded-full" />
-                            </div>
-                        </div>
-                        <div className={`bg-surfaceHighlight/50 ${statBoxClass} rounded-lg border border-white/5`}>
-                            <div className="flex justify-between text-xs font-bold uppercase text-textMuted mb-2">
-                                <span>Crew</span>
-                                <span className="text-green-400">Fresh</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 w-[95%] rounded-full" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* AI Reasoning Box: Medium Density */}
-                    <div className={`bg-blue-900/20 border border-blue-500/30 rounded-lg relative overflow-hidden group shrink-0 ${isInline ? "p-4" : "p-6"}`}>
-                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50" />
-                        <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <Gauge className="w-4 h-4" /> AI Analysis
-                        </h3>
-                        <p className={`${isInline ? "text-base" : "text-lg"} text-blue-100 font-medium leading-relaxed`}>
-                            Crew has <span className="text-white font-bold">89% punctuality</span>. Traffic favors B13 approach.
-                        </p>
-                    </div>
-
-                    {/* Detailed Stats List: Medium Density */}
-                    <div className="space-y-3 overflow-y-auto pr-1">
-                        <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors border-l-2 border-green-500 pl-4">
-                            <MapPin className="w-5 h-5 text-green-500 mt-1" />
-                            <div>
-                                <div className="font-bold text-green-400 text-sm uppercase">Route</div>
-                                <div className="text-sm text-textMuted">3.0 km • Clear</div>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors border-l-2 border-red-500 pl-4 bg-red-500/5">
-                            <AlertTriangle className="w-5 h-5 text-red-500 mt-1" />
-                            <div>
-                                <div className="font-bold text-red-400 text-sm uppercase">Warning</div>
-                                <div className="text-sm text-textMuted">Missing: <span className="text-white">Rescue Boat</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Sidebar (Alternatives): Hidden if inline and space is tight? Or keep it very small? 
-                    User asked for "Disposition container without requiring excessive scrolling".
-                    If we show alternatives in inline view, it might cramp it.
-                    Let's only show alternatives if NOT inline, OR make it a bottom section?
-                    For now, hiding alternatives in Inline High Density View to save space, or making it collapse?
-                    Let's keep it but formatted densely. 
-                */}
-                {/* Sidebar (Alternatives) */}
-                <div className={`${isInline ? "w-full h-32 border-t md:w-48 md:h-auto md:border-l md:border-t-0" : "w-80 border-l"} border-white/10 bg-black/20 p-3 overflow-y-auto shrink-0`}>
-                    <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-[10px] font-bold text-textMuted uppercase tracking-widest">Alternatives</h3>
-                        {!isInline && (
-                            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                                <X className="w-5 h-5 text-white" />
+                {/* Header Section */}
+                <div className="flex justify-between items-start shrink-0 mb-2">
+                    <div className="flex gap-4 items-center">
+                        {/* Back Button for Inline Mode */}
+                        {isInline && (
+                            <button
+                                onClick={onClose}
+                                className="h-10 w-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group mr-2"
+                                title="Back to List"
+                            >
+                                <ArrowLeft className="w-5 h-5 text-textMuted group-hover:text-white" />
                             </button>
                         )}
+                        <div>
+                            <div className="text-[10px] font-mono text-textMuted uppercase tracking-widest mb-1 opacity-70">
+                                SYSTEM PROPOSAL (PRIMARY OPTION)
+                            </div>
+                            <h1 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
+                                {resource.callsign}
+                            </h1>
+                            <div className="flex gap-4 text-xs text-textMuted mt-2 font-medium">
+                                <span className="flex items-center gap-1.5"><Battery className="w-3.5 h-3.5" /> 22% Battery</span>
+                                <span className="flex items-center gap-1.5 text-green-400"><CheckCircle className="w-3.5 h-3.5" /> Operational</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-2">
-                        {/* Mock Alternatives */}
-                        <div className="p-2 rounded border border-white/10 bg-white/5 hover:border-white/20 transition-all cursor-pointer group">
-                            <div className="flex justify-between items-start mb-1">
-                                <span className="font-bold text-white text-sm">IN-RK 71/1</span>
-                                <span className="text-red-400 font-mono text-xs">40%</span>
-                            </div>
-                            <div className="text-[10px] text-textMuted mb-2">+1m • Missing Equip</div>
-                            <button className="w-full py-1 text-[10px] font-bold uppercase tracking-wider bg-white/5 hover:bg-primary hover:text-white rounded transition-colors text-textMuted">
-                                Select
-                            </button>
+                    <div className="text-right">
+                        <div className="text-5xl font-black text-white tracking-tight leading-none mb-1">
+                            {resource.eta}
                         </div>
-                        <div className="p-2 rounded border border-white/10 bg-white/5 hover:border-white/20 transition-all cursor-pointer group">
-                            <div className="flex justify-between items-start mb-1">
-                                <span className="font-bold text-white text-sm">MHD-IN 1</span>
-                                <span className="text-red-400 font-mono text-xs">32%</span>
+                        <div className={`text-lg font-bold ${resource.matchScore > 90 ? "text-green-500" : "text-yellow-500"}`}>
+                            {resource.matchScore}% <span className="text-[10px] text-textMuted font-mono uppercase tracking-widest opacity-70 ml-1">SYSTEM CONFIDENCE</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Top Status Cards */}
+                <div className="grid grid-cols-3 gap-3 shrink-0">
+                    <div className="bg-white/5 rounded-lg border border-white/10 p-3">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider mb-2">
+                            <span className="text-textMuted">ROUTE</span>
+                            <span className="text-yellow-500">STABLE</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-yellow-500 w-[60%] rounded-full" />
+                        </div>
+                    </div>
+                    <div className="bg-white/5 rounded-lg border border-white/10 p-3">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider mb-2">
+                            <span className="text-textMuted">EQUIPMENT</span>
+                            <span className="text-red-500">MISSING</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-red-500 w-[30%] rounded-full" />
+                        </div>
+                    </div>
+                    <div className="bg-white/5 rounded-lg border border-white/10 p-3">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider mb-2">
+                            <span className="text-textMuted">CREW STATUS</span>
+                            <span className="text-green-500">STABLE</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 w-[85%] rounded-full" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 2-Column Content Grid */}
+                <div className="flex-1 grid grid-cols-2 gap-4 overflow-hidden min-h-0">
+
+                    {/* Left Column: AI Analysis */}
+                    <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+                        <div className="text-[10px] font-bold text-textMuted uppercase tracking-widest">
+                            AI RATIONALE
+                        </div>
+
+                        {/* Blue Box */}
+                        <div className="bg-blue-950/40 border border-blue-500/30 rounded-lg p-4 relative overflow-hidden group">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
+                            <h3 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <Gauge className="w-3.5 h-3.5" /> CONFIDENCE CALIBRATION
+                            </h3>
+                            <p className="text-sm text-blue-100/90 font-medium leading-relaxed">
+                                Crew has an <span className="text-white font-bold">89% punctuality rate</span> for standard missions. <span className="text-green-400 text-xs">↗ Improving</span>
+                            </p>
+                        </div>
+
+                        {/* Unified Status Cards */}
+                        <div className="space-y-3 mt-2">
+                            {/* Card A: Route + Distance */}
+                            <div className="bg-white/5 rounded-lg border border-white/5 p-3 flex justify-between items-center group hover:border-white/10 transition-colors">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">ROUTE STATUS</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                                        <span className="text-white font-bold text-sm">Target Reachable</span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">DISTANCE</div>
+                                    <div className="font-mono text-white text-sm">3.0 km</div>
+                                </div>
                             </div>
-                            <div className="text-[10px] text-textMuted mb-2">+4m • Traffic</div>
-                            <button className="w-full py-1 text-[10px] font-bold uppercase tracking-wider bg-white/5 hover:bg-primary hover:text-white rounded transition-colors text-textMuted">
-                                Select
-                            </button>
+
+                            {/* Card B: Crew + Workload */}
+                            <div className="bg-white/5 rounded-lg border border-white/5 p-3 flex justify-between items-center group hover:border-white/10 transition-colors">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">CREW STATUS</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                                        <span className="text-white font-bold text-sm">Fresh Crew</span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] font-bold text-textMuted uppercase tracking-widest mb-1">WORKLOAD</div>
+                                    <div className="font-mono text-green-400 text-sm">Low Load</div>
+                                </div>
+                            </div>
+
+                            {/* Card C: Protocol + Missing */}
+                            <div className="bg-red-500/10 rounded-lg border border-red-500/20 p-3 flex justify-between items-center group hover:border-red-500/30 transition-colors">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-red-400/70 uppercase tracking-widest mb-1">PROTOCOL CHECK</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                                        <span className="text-red-100 font-bold text-sm">Mismatch</span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-[10px] font-bold text-red-400/70 uppercase tracking-widest mb-1">MISSING ITEMS</div>
+                                    <div className="font-mono text-red-100 text-sm">Rescue Boat</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Secondary Factors Footer (Directly below, no mt-auto) */}
+                        <div className="pt-4 mt-2 border-t border-white/5">
+                            <div className="text-[9px] font-bold text-textMuted uppercase tracking-widest mb-3 opacity-60">
+                                SECONDARY FACTORS
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="bg-white/5 rounded px-2.5 py-1.5 border border-white/5 text-[10px] font-bold text-textMuted flex items-center gap-1.5 whitespace-nowrap">
+                                    <Clock className="w-3 h-3 text-textMuted" /> System Load: 4/10
+                                </div>
+                                <div className="bg-white/5 rounded px-2.5 py-1.5 border border-white/5 text-[10px] font-bold text-textMuted flex items-center gap-1.5 whitespace-nowrap">
+                                    <MapPin className="w-3 h-3 text-textMuted" /> Weather: Clear, 22°C
+                                </div>
+                                <div className="bg-white/5 rounded px-2.5 py-1.5 border border-white/5 text-[10px] font-bold text-textMuted flex items-center gap-1.5 whitespace-nowrap">
+                                    Daylight
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Alternatives */}
+                    <div className="flex flex-col gap-4 overflow-y-auto pl-1 border-l border-white/5">
+                        <div className="text-[10px] font-bold text-textMuted uppercase tracking-widest px-2">
+                            ALTERNATIVES
+                        </div>
+
+                        <div className="space-y-3 px-2 pb-2">
+                            {/* Static Mock Alternatives for UI Polish */}
+                            {[
+                                { id: 'alt1', name: 'IN-RK 71/1', match: '36-40%', delta: '+1m Approach', warning: 'Equipment Missing' },
+                                { id: 'alt2', name: 'IN-RK 71/3', match: '36-40%', delta: '+1m Approach', warning: 'Equipment Missing' },
+                                { id: 'alt3', name: 'MHD-IN 1', match: '32-42%', delta: '+1m Approach', warning: 'Equipment Missing' },
+                                { id: 'alt4', name: 'IN-RK 73/1', match: '16-20%', delta: '+6m Approach', warning: 'Equipment Missing' },
+                            ].map((alt) => (
+                                <div key={alt.id} className="p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group relative">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="font-bold text-white text-sm">{alt.name}</span>
+                                        <span className="text-red-400 font-bold font-mono text-sm">{alt.match}</span>
+                                    </div>
+                                    <div className="text-xs text-textMuted mb-2">{alt.delta}</div>
+                                    {alt.warning && (
+                                        <div className="text-xs text-yellow-500 flex items-center gap-1.5 font-medium mb-3">
+                                            <AlertTriangle className="w-3 h-3" /> {alt.warning}
+                                        </div>
+                                    )}
+                                    <button className="w-full py-1.5 text-[10px] font-bold uppercase tracking-wider bg-transparent border border-white/20 hover:bg-primary hover:border-primary hover:text-white rounded transition-colors text-textMuted flex items-center justify-center gap-2">
+                                        Select as Expert Choice
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                 </div>
+
             </div>
         </Container>
     );
