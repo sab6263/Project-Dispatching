@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { MapComponent } from './MapComponent';
 import { MapSidebar } from './MapSidebar';
 import { useMapSimulation } from '../../hooks/useMapSimulation';
-import { INCIDENTS, STATIONS } from '../../data/mockMapData';
+import { INCIDENTS, STATIONS } from '../../data/mockData';
 
 export const MapView = () => {
     const { vehicles, hospitals } = useMapSimulation();

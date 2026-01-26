@@ -1,6 +1,8 @@
 import React from 'react';
 import { X, MapPin, AlertTriangle, ArrowLeft, Sparkles, Clock } from 'lucide-react';
-import type { Vehicle, Station, Hospital, Incident } from '../../data/mockMapData';
+import { useCAD } from '../../context/CADContext';
+import { cn } from '../../lib/utils';
+import type { Vehicle, Station, Hospital, Incident } from '../../data/mockData';
 
 interface MapSidebarProps {
     item: any;
@@ -13,11 +15,44 @@ interface MapSidebarProps {
 }
 
 export const MapSidebar: React.FC<MapSidebarProps> = ({ item, onClose, incidents, routeMetrics, vehicles, stations, onSelectVehicle }) => {
+    const { addToDispatchProposal, dispatchProposalUnits } = useCAD();
+
     if (!item) return null;
+
+    const isVehicleAdded = (id: string) => dispatchProposalUnits.some(u => u.id === id);
+    const isStationAdded = item.type === 'Station' && vehicles.filter(v => v.stationId === item.id).some(v => isVehicleAdded(v.id));
 
     const parentStation = item.type === 'Vehicle' && item.stationId && item.status === 'Available' && stations
         ? stations.find(s => s.id === item.stationId)
         : null;
+
+    const handleAddToProposal = () => {
+        if (item.type === 'Vehicle') {
+            const useStationRouting = item.status === 'Available' && parentStation?.mockRouting;
+            const baseDriveTime = useStationRouting
+                ? parentStation.mockRouting.baseTime
+                : (routeMetrics?.baseTime || 0);
+            const trafficDelay = useStationRouting
+                ? parentStation.mockRouting.trafficDelay
+                : (routeMetrics?.delay || 0);
+            const totalDriveTime = baseDriveTime + trafficDelay;
+
+            addToDispatchProposal({
+                id: item.id,
+                callSign: item.name,
+                type: item.subtype as any,
+                category: item.category,
+                status: item.status as any,
+                location: { lat: item.position[0], lng: item.position[1] },
+                eta: `${totalDriveTime} min`,
+                distance: routeMetrics?.distance
+                    ? `${routeMetrics.distance} km`
+                    : (baseDriveTime > 0 ? `${(baseDriveTime * 0.7).toFixed(1)} km` : '--'),
+                capabilities: [],
+                statusLastUpdated: new Date().toISOString()
+            });
+        }
+    };
 
     return (
         <div className="glass-panel animate-slide-in" style={{
@@ -74,7 +109,7 @@ export const MapSidebar: React.FC<MapSidebarProps> = ({ item, onClose, incidents
                 {item.type === 'Vehicle' && <VehicleDetails vehicle={item} incidents={incidents} routeMetrics={routeMetrics} stations={stations} />}
                 {item.type === 'Hospital' && <HospitalDetails hospital={item} />}
                 {item.type === 'Incident' && <IncidentDetails incident={item} />}
-                {item.type === 'Station' && <StationDetails station={item} vehicles={vehicles} onSelectVehicle={onSelectVehicle} routeMetrics={routeMetrics} />}
+                {item.type === 'Station' && <StationDetails station={item} vehicles={vehicles} onSelectVehicle={onSelectVehicle} routeMetrics={routeMetrics} dispatchProposalUnits={dispatchProposalUnits} />}
             </div>
 
             {/* Actions */}
@@ -84,11 +119,11 @@ export const MapSidebar: React.FC<MapSidebarProps> = ({ item, onClose, incidents
                         <div style={{
                             width: '100%',
                             padding: '16px',
-                            background: 'rgba(59, 130, 246, 0.1)',
-                            border: '2px dashed #3b82f6',
+                            background: isStationAdded ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+                            border: isStationAdded ? '2px solid #22c55e' : '2px dashed #3b82f6',
                             borderRadius: '8px',
                             textAlign: 'center',
-                            color: '#60a5fa',
+                            color: isStationAdded ? '#4ade80' : '#60a5fa',
                             fontWeight: 500,
                             fontSize: '0.9rem',
                             cursor: 'pointer',
@@ -97,12 +132,12 @@ export const MapSidebar: React.FC<MapSidebarProps> = ({ item, onClose, incidents
                             onDragOver={(e) => {
                                 e.preventDefault();
                                 e.dataTransfer.dropEffect = 'move';
-                                e.currentTarget.style.background = 'rgba(59, 130, 246, 0.3)';
-                                e.currentTarget.style.borderColor = '#60a5fa';
+                                e.currentTarget.style.background = isStationAdded ? 'rgba(34, 197, 94, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+                                e.currentTarget.style.borderColor = isStationAdded ? '#4ade80' : '#60a5fa';
                             }}
                             onDragLeave={(e) => {
-                                e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
-                                e.currentTarget.style.borderColor = '#3b82f6';
+                                e.currentTarget.style.background = isStationAdded ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.1)';
+                                e.currentTarget.style.borderColor = isStationAdded ? '#22c55e' : '#3b82f6';
                             }}
                             onDrop={(e) => {
                                 e.preventDefault();
@@ -110,35 +145,59 @@ export const MapSidebar: React.FC<MapSidebarProps> = ({ item, onClose, incidents
                                 e.currentTarget.style.borderColor = '#3b82f6';
                                 const vehicleData = e.dataTransfer.getData('vehicle');
                                 if (vehicleData) {
-                                    const vehicle = JSON.parse(vehicleData);
-                                    console.log('🚑 VEHICLE DROPPED TO DISPATCH PROPOSAL:', {
-                                        vehicle: vehicle,
-                                        station: item,
-                                        timestamp: new Date().toISOString()
-                                    });
+                                    try {
+                                        const vehicle = JSON.parse(vehicleData);
+                                        // Calculate ETA for dropped unit
+                                        const unitParentStation = vehicle.stationId && stations
+                                            ? stations.find((s: Station) => s.id === vehicle.stationId)
+                                            : null;
+                                        const useStationRouting = vehicle.status === 'Available' && unitParentStation?.mockRouting;
+                                        const baseTime = useStationRouting ? unitParentStation.mockRouting.baseTime : (routeMetrics?.baseTime || 0);
+                                        const delay = useStationRouting ? unitParentStation.mockRouting.trafficDelay : (routeMetrics?.delay || 0);
+
+                                        addToDispatchProposal({
+                                            id: vehicle.id,
+                                            callSign: vehicle.name,
+                                            type: vehicle.subtype as any,
+                                            category: vehicle.category,
+                                            status: vehicle.status as any,
+                                            location: { lat: vehicle.position[0], lng: vehicle.position[1] },
+                                            eta: `${baseTime + delay} min`,
+                                            distance: routeMetrics?.distance
+                                                ? `${routeMetrics.distance} km`
+                                                : (baseTime > 0 ? `${(baseTime * 0.7).toFixed(1)} km` : '--'),
+                                            capabilities: [],
+                                            statusLastUpdated: new Date().toISOString()
+                                        });
+                                    } catch (err) {
+                                        console.error('Failed to parse dropped vehicle', err);
+                                    }
                                 }
                             }}
                         >
-                            Add to dispatch proposal
+                            {isStationAdded ? 'Units from this station in proposal' : 'Add to dispatch proposal'}
                         </div>
                     ) : (
-                        <button style={{
-                            width: '100%',
-                            padding: '12px',
-                            background: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontWeight: 600,
-                            fontSize: '1rem',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'pointer',
-                            transition: 'background 0.2s'
-                        }}>
-                            Add to dispatch proposal
+                        <button
+                            onClick={handleAddToProposal}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                background: isVehicleAdded(item.id) ? '#22c55e' : '#3b82f6',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '1rem',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '8px',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
+                            }}
+                        >
+                            {isVehicleAdded(item.id) ? 'Vehicle added to proposal' : 'Add to dispatch proposal'}
                         </button>
                     )}
                 </div>
@@ -485,8 +544,10 @@ const IncidentDetails = ({ incident }: { incident: Incident }) => (
     </div>
 );
 
-const StationDetails = ({ station, vehicles, onSelectVehicle }: any) => {
+const StationDetails = ({ station, vehicles, onSelectVehicle, dispatchProposalUnits }: any) => {
     const stationVehicles = vehicles.filter((v: Vehicle) => v.stationId === station.id && v.status === 'Available');
+
+    const isVehicleAdded = (id: string) => dispatchProposalUnits.some((u: any) => u.id === id);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -542,10 +603,25 @@ const StationDetails = ({ station, vehicles, onSelectVehicle }: any) => {
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     cursor: 'grab',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    position: 'relative',
+                                    overflow: 'hidden'
                                 }}
-                                className="bg-white/5 border border-transparent hover:bg-white/10 hover:border-blue-500/30 hover:shadow-md"
+                                className={cn(
+                                    "bg-white/5 border border-transparent hover:bg-white/10 hover:border-blue-500/30 hover:shadow-md",
+                                    isVehicleAdded(v.id) && "ring-1 ring-green-500/50 bg-green-500/5"
+                                )}
                             >
+                                {isVehicleAdded(v.id) && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 0,
+                                        width: '4px',
+                                        height: '100%',
+                                        background: '#22c55e'
+                                    }} />
+                                )}
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{v.subtype}</div>
                                     <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{v.name}</div>

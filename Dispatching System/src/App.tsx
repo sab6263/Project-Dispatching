@@ -44,7 +44,7 @@ function App() {
     <CADProvider>
       <Layout>
         <Sidebar activeWorkspace={activeWorkspace} onWorkspaceChange={setActiveWorkspace} />
-        <main className="flex-1 relative overflow-auto">
+        <main className="flex-1 relative overflow-hidden">
           {activeWorkspace === 'A' && <CallTakingView />}
           {activeWorkspace === 'B' && <SituationalAwarenessView />}
           {activeWorkspace === 'C' && <DispatchingView />}

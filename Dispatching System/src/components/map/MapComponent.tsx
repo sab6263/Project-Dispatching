@@ -6,7 +6,7 @@ import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Building2, Plus } from 'lucide-react';
-import type { Hospital, Vehicle, Incident, Station } from '../../data/mockMapData';
+import type { Hospital, Vehicle, Incident, Station } from '../../data/mockData';
 
 // Fix Leaflet Default Icon
 // @ts-ignore

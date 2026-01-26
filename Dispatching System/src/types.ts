@@ -24,8 +24,10 @@ export interface Unit {
     id: string;
     callSign: string; // e.g. "Florian München 1/46-1"
     type: UnitType;
+    category?: 'Fire' | 'EMS';
     status: UnitStatus;
     distance?: string;
+    eta?: string;
     location: {
         lat: number;
         lng: number;

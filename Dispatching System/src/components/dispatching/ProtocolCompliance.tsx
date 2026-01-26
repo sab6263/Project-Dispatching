@@ -16,7 +16,7 @@ export const ProtocolCompliance: React.FC<ProtocolComplianceProps> = ({ required
             {requiredCategories.map((category) => {
                 // Logic: A category is satisfied if AT LEAST ONE selected unit matches the type
                 const isSatisfied = selectedResources.some(
-                    (res) => res.type === category && res.isSelectedForDispatch
+                    (res) => res.type.includes(category) && res.isSelectedForDispatch
                 );
 
                 return (

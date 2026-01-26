@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Mic, PauseCircle, PlayCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Mic, PauseCircle, PlayCircle, PanelLeftClose, PanelLeftOpen, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useCAD } from '../../context/CADContext';
 
@@ -32,6 +32,8 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
     const [confidenceScore, setConfidenceScore] = useState(92);
     const [showConfidenceHelp, setShowConfidenceHelp] = useState(false);
     const [isListening, setIsListening] = useState(true);
+    const [isAutoScrollPaused, setIsAutoScrollPaused] = useState(false);
+    const [hasNewMessages, setHasNewMessages] = useState(false);
 
     useEffect(() => {
         // Fluctuate confidence slightly for realism
@@ -55,17 +57,45 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
             }));
 
             setCurrentIndex(prev => prev + 1);
+
+            // If auto-scroll is paused, notify user about new messages
+            if (isAutoScrollPaused) {
+                setHasNewMessages(true);
+            }
         }, 2000); // 2 seconds between lines
 
         return () => clearTimeout(timeout);
-    }, [currentIndex, isPaused, setActiveCall]);
+    }, [currentIndex, isPaused, setActiveCall, isAutoScrollPaused]);
 
-    // Auto-scroll
+    // Auto-scroll logic
     useEffect(() => {
+        if (scrollRef.current && !isAutoScrollPaused) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [lines, isAutoScrollPaused]);
+
+    const handleScroll = () => {
+        if (scrollRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+            // Detect if we are at the bottom (with some tolerance)
+            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+            if (isAtBottom) {
+                setIsAutoScrollPaused(false);
+                setHasNewMessages(false);
+            } else {
+                setIsAutoScrollPaused(true);
+            }
+        }
+    };
+
+    const resumeAutoScroll = () => {
+        setIsAutoScrollPaused(false);
+        setHasNewMessages(false);
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [lines]);
+    };
 
     const handleDragStart = (e: React.DragEvent, text: string, type: string) => {
         e.dataTransfer.setData("text/plain", text);
@@ -250,11 +280,11 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
                 </div>
             </div>
 
-            {/* Scrollable Transcript Area - Fixed Height to 1000px as requested */}
+            {/* Scrollable Transcript Area - Now uses flex to fill available space */}
             <div
-                className="w-full overflow-y-auto p-4 space-y-4 scroll-smooth border-t border-white/5 bg-black/20"
+                className="flex-1 min-h-0 w-full overflow-y-auto p-4 space-y-4 scroll-smooth border-t border-white/5 bg-black/20"
                 ref={scrollRef}
-                style={{ height: '1000px', flex: 'none' }} // Strict Height: 1000px
+                onScroll={handleScroll}
             >
                 {lines.map((line, idx) => {
                     const isCaller = idx % 2 !== 0;
@@ -288,6 +318,19 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
                     </div>
                 )}
             </div>
+
+            {/* Resume Auto-scroll Button - Minimalist Stationary Arrow */}
+            {isAutoScrollPaused && (
+                <button
+                    onClick={resumeAutoScroll}
+                    className={cn(
+                        "absolute bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all bg-white/10 backdrop-blur-md border border-white/20 text-white/70 shadow-xl hover:bg-white/20 hover:text-white active:scale-95 group",
+                    )}
+                    title="Resume Auto-scroll"
+                >
+                    <ChevronDown className="w-5 h-5 group-hover:translate-y-0.5 transition-transform" />
+                </button>
+            )}
         </div>
     );
 };

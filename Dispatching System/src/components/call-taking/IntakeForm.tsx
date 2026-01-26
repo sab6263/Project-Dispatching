@@ -24,13 +24,13 @@ const MagicInput = ({ label, icon: Icon, field, value, placeholder, half = false
     const handleDragEnter = (e: React.DragEvent) => {
         e.preventDefault();
         const target = e.currentTarget as HTMLElement;
-        target.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+        target.classList.add('border-primary', 'bg-primary/5');
     };
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
         const target = e.currentTarget as HTMLElement;
-        target.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+        target.classList.remove('border-primary', 'bg-primary/5');
     };
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -60,8 +60,7 @@ const MagicInput = ({ label, icon: Icon, field, value, placeholder, half = false
                 <input
                     type="text"
                     className={cn(
-                        "w-full bg-surface border rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600",
-                        aiFilledFields[field] ? "border-purple-500/40 shadow-[0_0_15px_-5px_rgba(168,85,247,0.3)]" : "border-white/10 focus:border-primary focus:ring-1 focus:ring-primary/50"
+                        "w-full bg-surface border border-white/10 rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600 focus:border-primary focus:ring-1 focus:ring-primary/50"
                     )}
                     placeholder={placeholder}
                     value={value || ''}
@@ -185,20 +184,20 @@ export const IntakeForm: React.FC = () => {
 
             // Remove active drag style immediately
             const target = e.currentTarget as HTMLElement;
-            target.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+            target.classList.remove('border-primary', 'bg-primary/5');
         }
     };
 
     const handleDragEnter = (e: React.DragEvent) => {
         e.preventDefault();
         const target = e.currentTarget as HTMLElement;
-        target.classList.add('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+        target.classList.add('border-primary', 'bg-primary/5');
     };
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
         const target = e.currentTarget as HTMLElement;
-        target.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-500/10');
+        target.classList.remove('border-primary', 'bg-primary/5');
     };
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -260,7 +259,7 @@ export const IntakeForm: React.FC = () => {
     };
 
     return (
-        <div className="h-full flex flex-col gap-4 overflow-visible"> {/** Changed overflow-hidden to visible for dropdowns */}
+        <div className="h-full flex flex-col gap-4">
             {/* Tabs */}
             <div className="flex bg-surfaceHighlight/30 p-1 rounded-xl shrink-0">
                 <button
@@ -283,11 +282,11 @@ export const IntakeForm: React.FC = () => {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4 pb-20">
+            <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-1">
                 {/* Added pb-20 to ensure scrolling space for dropdowns at bottom */}
 
                 {/* --- SECTION 1: CALLER --- */}
-                <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative overflow-hidden backdrop-blur-sm">
+                <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative backdrop-blur-sm">
                     <h3 className="text-xs font-bold text-textMuted uppercase mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
                         <User className="w-3.5 h-3.5" /> Caller Information
                     </h3>
@@ -309,7 +308,7 @@ export const IntakeForm: React.FC = () => {
 
                 {/* --- SECTION 2: SCHEDULED ONLY - PATIENT --- */}
                 {activeTab === 'scheduled' && (
-                    <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative overflow-hidden">
+                    <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative">
                         <h3 className="text-xs font-bold text-textMuted uppercase mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
                             <UserPlus className="w-3.5 h-3.5" /> Patient Details
                         </h3>
@@ -327,7 +326,7 @@ export const IntakeForm: React.FC = () => {
                 )}
 
                 {/* --- SECTION 3: LOCATION --- */}
-                <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative overflow-hidden">
+                <div className="bg-surface/50 rounded-xl border border-white/5 p-4 relative">
                     <h3 className="text-xs font-bold text-textMuted uppercase mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
                         <MapPin className="w-3.5 h-3.5" /> Incident Location
                     </h3>

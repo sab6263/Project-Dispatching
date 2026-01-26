@@ -1,5 +1,4 @@
-import React from 'react';
-import { Ambulance, Truck, ShieldAlert, CheckCircle2, BriefcaseMedical, Users, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
+import { Ambulance, Truck, CheckCircle2, Trash2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export interface ResourceCardProps {
@@ -10,22 +9,25 @@ export interface ResourceCardProps {
     matchScore: number;
     distance?: string;
     trafficInfo?: string;
+    category?: 'Fire' | 'EMS';
     // Selection for Detail View Focus
     isSelected?: boolean;
     onClick?: () => void;
     // Selection for Dispatch (Protocol Compliance)
     isSelectedForDispatch?: boolean;
     onToggleSelection?: (e: React.MouseEvent) => void;
-    onSwap?: (e: React.MouseEvent) => void;
+    onRemove?: (e: React.MouseEvent) => void;
+    isManual?: boolean;
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
-    id, type, callsign, eta, matchScore,
-    distance, trafficInfo,
+    type, callsign, eta, matchScore,
+    distance, category,
     isSelected, onClick,
     isSelectedForDispatch = true, // Default to true
     onToggleSelection,
-    onSwap
+    onRemove,
+    isManual
 }) => {
 
     // Helper for color ring based on score
@@ -65,13 +67,13 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                     {isSelectedForDispatch && <CheckCircle2 className="w-3.5 h-3.5" />}
                 </div>
 
-                {/* Swap Action */}
+                {/* Remove Action */}
                 <div
-                    onClick={onSwap}
-                    className="w-6 h-6 rounded border border-white/10 bg-surface flex items-center justify-center text-textMuted hover:text-white hover:border-white/40 hover:bg-white/10 transition-colors cursor-pointer"
-                    title="Swap Unit"
+                    onClick={onRemove}
+                    className="w-6 h-6 rounded border border-white/10 bg-surface flex items-center justify-center text-textMuted hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    title="Remove from list"
                 >
-                    <RefreshCw className="w-3 h-3" />
+                    <Trash2 className="w-3.5 h-3.5" />
                 </div>
             </div>
 
@@ -83,10 +85,11 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                         "p-3 rounded-xl bg-white/5 flex items-center justify-center transition-colors",
                         isSelected ? 'text-primary bg-primary/20' : 'text-textMuted group-hover:text-white'
                     )}>
-                        {type === 'RTW' && <Ambulance className="w-6 h-6" />}
-                        {type === 'NEF' && <Truck className="w-6 h-6" />}
-                        {type === 'HLF' && <Truck className="w-6 h-6" />}
-                        {type === 'DLK' && <Truck className="w-6 h-6" />}
+                        {(type.includes('RTW') || type.includes('KTW') || (category === 'EMS' && !type.includes('NEF'))) ? (
+                            <Ambulance className="w-6 h-6" />
+                        ) : (
+                            <Truck className="w-6 h-6" />
+                        )}
                     </div>
 
                     {/* Text Details */}
@@ -101,24 +104,32 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({
                         <div className="flex items-center gap-2 text-xs font-mono">
                             <span className="text-green-400 font-bold">{eta}</span>
                             <span className="text-white/20">•</span>
-                            <span className="text-textMuted">{distance}</span>
+                            <span className="text-textMuted">{distance}{distance && !distance.includes('km') && !distance.includes('--') ? ' km' : ''}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Right Side: Score & Label */}
-                <div className="flex flex-col items-end justify-center min-w-[80px]">
-                    {/* Score Ring */}
-                    <div className={cn(
-                        "relative w-12 h-12 flex items-center justify-center rounded-full border-[3px] font-bold text-sm bg-black/20 mb-1",
-                        getScoreColor(matchScore)
-                    )}>
-                        {matchScore}%
+                {!isManual ? (
+                    <div className="flex flex-col items-end justify-center min-w-[80px]">
+                        {/* Score Ring */}
+                        <div className={cn(
+                            "relative w-12 h-12 flex items-center justify-center rounded-full border-[3px] font-bold text-sm bg-black/20 mb-1",
+                            getScoreColor(matchScore)
+                        )}>
+                            {matchScore}%
+                        </div>
+                        <span className="text-[9px] font-bold text-textMuted uppercase tracking-wider text-right leading-tight">
+                            System<br />Confidence
+                        </span>
                     </div>
-                    <span className="text-[9px] font-bold text-textMuted uppercase tracking-wider text-right leading-tight">
-                        System<br />Confidence
-                    </span>
-                </div>
+                ) : (
+                    <div className="flex flex-col items-end justify-center min-w-[80px] pt-2">
+                        <span className="px-2 py-1 rounded bg-blue-500/20 border border-blue-500/30 text-[10px] font-bold text-blue-300 uppercase tracking-widest flex items-center gap-1.5">
+                            User Added
+                        </span>
+                    </div>
+                )}
             </div >
         </div >
     );

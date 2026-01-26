@@ -44,14 +44,14 @@ export const CallTakingView: React.FC = () => {
         <div className="absolute inset-0 bg-background flex flex-col">
             <CallHeader />
 
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-h-0">
                 <PanelGroup direction="horizontal" style={{ height: '100%' }}>
                     {/* Left Panel: Transcript */}
                     <Panel
                         ref={transcriptPanelRef}
                         defaultSize={isDispatchReady ? 30 : 55}
                         minSize={15}
-                        className="p-4 pr-2 transition-all duration-400 ease-in-out h-full flex flex-col overflow-hidden"
+                        className="p-4 pr-2 transition-all duration-400 ease-in-out min-h-0 h-full"
                     >
                         <LiveTranscript />
                     </Panel>
@@ -65,7 +65,7 @@ export const CallTakingView: React.FC = () => {
                         ref={formPanelRef}
                         defaultSize={45}
                         minSize={30}
-                        className="p-4 px-2 transition-all duration-400 ease-in-out"
+                        className="p-4 px-2 transition-all duration-400 ease-in-out min-h-0 h-full"
                     >
                         <IntakeForm />
                     </Panel>
@@ -81,7 +81,7 @@ export const CallTakingView: React.FC = () => {
                             ref={dispatchPanelRef}
                             defaultSize={25}
                             minSize={20}
-                            className="p-4 pl-2 h-full flex flex-col overflow-hidden animate-in slide-in-from-right duration-500 transition-all duration-400 ease-in-out"
+                            className="p-4 pl-2 min-h-0 h-full overflow-y-auto animate-in slide-in-from-right duration-500"
                         >
                             <DispatchRecommendation onFocusModeChange={setIsFocusMode} />
                         </Panel>

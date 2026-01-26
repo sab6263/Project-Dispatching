@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { VEHICLES as INITIAL_VEHICLES, HOSPITALS as INITIAL_HOSPITALS } from '../data/mockMapData';
-import type { Vehicle, Hospital } from '../data/mockMapData';
+import { VEHICLES as INITIAL_VEHICLES, HOSPITALS as INITIAL_HOSPITALS } from '../data/mockData';
+import type { Vehicle, Hospital } from '../data/mockData';
 
 export const useMapSimulation = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_VEHICLES);
