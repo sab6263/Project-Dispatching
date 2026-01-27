@@ -22,37 +22,37 @@ export const useMapSimulation = () => {
                 })
             );
 
-            // 2. Hospital Simulation
-            setHospitals(currentHospitals =>
-                currentHospitals.map(h => {
-                    if (Math.random() > 0.2) {
-                        return h;
-                    }
+            // 2. Hospital Simulation - DISABLED to keep values static
+            // setHospitals(currentHospitals =>
+            //     currentHospitals.map(h => {
+            //         if (Math.random() > 0.2) {
+            //             return h;
+            //         }
 
-                    const maxAdmissions = Math.max(5, Math.ceil(h.bedsTotal / 50));
-                    const currentAdmissions = h.admissions !== undefined ? h.admissions : Math.round(maxAdmissions * 0.5);
+            //         const maxAdmissions = Math.max(5, Math.ceil(h.bedsTotal / 50));
+            //         const currentAdmissions = h.admissions !== undefined ? h.admissions : Math.round(maxAdmissions * 0.5);
 
-                    const change = Math.floor(Math.random() * 3) - 1;
-                    let newAdmissions = Math.max(0, Math.min(maxAdmissions, currentAdmissions + change));
+            //         const change = Math.floor(Math.random() * 3) - 1;
+            //         let newAdmissions = Math.max(0, Math.min(maxAdmissions, currentAdmissions + change));
 
-                    const intensity = newAdmissions / maxAdmissions;
-                    const targetOccupancyRate = 0.50 + (intensity * 0.45);
-                    const noise = (Math.random() - 0.5) * 0.02;
-                    const finalOccupancyRate = Math.min(0.99, Math.max(0.4, targetOccupancyRate + noise));
+            //         const intensity = newAdmissions / maxAdmissions;
+            //         const targetOccupancyRate = 0.50 + (intensity * 0.45);
+            //         const noise = (Math.random() - 0.5) * 0.02;
+            //         const finalOccupancyRate = Math.min(0.99, Math.max(0.4, targetOccupancyRate + noise));
 
-                    const targetOccupied = Math.round(h.bedsTotal * finalOccupancyRate);
-                    const newAvailable = Math.max(0, h.bedsTotal - targetOccupied);
+            //         const targetOccupied = Math.round(h.bedsTotal * finalOccupancyRate);
+            //         const newAvailable = Math.max(0, h.bedsTotal - targetOccupied);
 
-                    const isCritical = newAvailable < 3 || (newAvailable / h.bedsTotal) < 0.02;
+            //         const isCritical = newAvailable < 3 || (newAvailable / h.bedsTotal) < 0.02;
 
-                    return {
-                        ...h,
-                        bedsAvailable: newAvailable,
-                        admissions: newAdmissions,
-                        emergencyAvailable: !isCritical
-                    };
-                })
-            );
+            //         return {
+            //             ...h,
+            //             bedsAvailable: newAvailable,
+            //             admissions: newAdmissions,
+            //             emergencyAvailable: !isCritical
+            //         };
+            //     })
+            // );
 
         }, 2000);
 

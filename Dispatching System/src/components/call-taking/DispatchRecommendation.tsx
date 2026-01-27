@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ResourceCard } from '../dispatching/ResourceCard';
 import { ResourceDetailModal } from '../dispatching/ResourceDetailModal'; // Using this as the view component
-import { Flame, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { useCAD } from '../../context/CADContext';
 import { cn } from '../../lib/utils';
 
@@ -181,7 +181,7 @@ export const DispatchRecommendation: React.FC<{ onFocusModeChange: (isFocus: boo
                     Add Unit
                 </button>
                 <button className="flex-[2] py-3 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold uppercase tracking-wider text-xs shadow-lg shadow-red-900/20 transition-all flex items-center justify-center gap-2">
-                    <Flame className="w-4 h-4" /> Dispatch
+                    Dispatch
                 </button>
             </div>
 

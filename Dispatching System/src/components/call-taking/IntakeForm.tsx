@@ -45,22 +45,25 @@ const MagicInput = ({ label, icon: Icon, field, value, placeholder, half = false
             onDragOver={handleDragOver}
             onDrop={(e) => onDrop(e, field)}
         >
-            <div className="flex justify-between px-1">
+            <div className="px-1">
                 <label className="text-xs font-medium text-textMuted flex items-center gap-1.5 uppercase tracking-wide">
                     {Icon && <Icon className="w-3 h-3 text-textMuted" />}
                     {label}
                 </label>
-                {aiFilledFields[field] && (
-                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 shadow-sm animate-in zoom-in">
+            </div>
+            {aiFilledFields[field] && (
+                <div className="absolute -top-1.5 right-1 z-20">
+                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 shadow-sm animate-in zoom-in duration-300">
                         <Sparkles className="w-2.5 h-2.5" /> AI-Sourced
                     </span>
-                )}
-            </div>
+                </div>
+            )}
             <div className="relative">
                 <input
                     type="text"
                     className={cn(
-                        "w-full bg-surface border border-white/10 rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600 focus:border-primary focus:ring-1 focus:ring-primary/50"
+                        "w-full bg-surface border border-white/10 rounded-lg p-3 text-sm text-white outline-none transition-all placeholder:text-stone-600 focus:border-primary focus:ring-1 focus:ring-primary/50",
+                        aiFilledFields[field] && "border-purple-500/50 bg-purple-500/5 ring-1 ring-purple-500/30"
                     )}
                     placeholder={placeholder}
                     value={value || ''}
@@ -128,18 +131,6 @@ export const IntakeForm: React.FC = () => {
     const handleDrop = (e: React.DragEvent, field: string) => {
         e.preventDefault();
 
-        // Strict Logic: Check key mappings
-        const typeMap: Record<string, string> = {
-            'callerName': 'callerName',
-            'location': 'location',
-            'keyFacts': 'keyword', // 'keyword' from LiveTranscript maps to 'keyFacts' here
-            'floor': 'details'
-        };
-
-        // If strict validation is required, check types. 
-        // For general usage: check if 'application/x-cad-[type]' exists
-        // simplified logic: allow text/plain fallback but prefer typed
-
         const text = e.dataTransfer.getData("text/plain");
 
         // Logic check: Only allow 'location' type into 'location' or 'zip'/'city' fields?
@@ -204,14 +195,16 @@ export const IntakeForm: React.FC = () => {
         e.preventDefault(); // Necessary to allow dropping
     };
 
-    // --- KEY FACTS LOGIC ---
     const addKeyFact = (fact: string) => {
         if (!fact.trim() || keyFacts.includes(fact.trim())) return;
         const newFacts = [...keyFacts, fact.trim()];
         setKeyFacts(newFacts);
         setTagInput('');
         setActiveCall(prev => ({ ...prev, keyword: newFacts.join(', ') }));
-        setAiFilledFields(prev => ({ ...prev, keyFacts: true }));
+
+        // If it was a manual addition (not from handleDrop), we might want to clear AI tag.
+        // But handleDrop also calls addKeyFact. 
+        // We'll manage the badge state in handleDrop vs manual input.
 
         // Smart Classification Derivation
         const lowerFact = fact.toLowerCase();
@@ -230,18 +223,21 @@ export const IntakeForm: React.FC = () => {
         const newFacts = keyFacts.filter(f => f !== fact);
         setKeyFacts(newFacts);
         setActiveCall(prev => ({ ...prev, keyword: newFacts.join(', ') }));
+        // Manual removal also counts as manual edit
+        setAiFilledFields(prev => ({ ...prev, keyFacts: false }));
     };
 
     // Quick Add Handler for Plus Menu
     const handleAddKeyword = (keyword: string) => {
         addKeyFact(keyword);
+        setAiFilledFields(prev => ({ ...prev, keyFacts: false }));
         setIsPlusMenuOpen(false);
     };
 
     const handleSelectClassification = (code: string, desc: string) => {
         setActiveCall(prev => ({ ...prev, code: code, priority: '1' })); // Default priority 1
         addKeyFact(desc); // Also add description as tag
-        setAiFilledFields(prev => ({ ...prev, code: true }));
+        setAiFilledFields(prev => ({ ...prev, code: false, keyFacts: false }));
         setIsClassificationOpen(false);
     };
 
@@ -339,20 +335,32 @@ export const IntakeForm: React.FC = () => {
                             <MagicInput label="District" field="district" value={activeCall['district' as keyof typeof activeCall]} placeholder="Area" half {...commonInputProps} />
                         </div>
 
-                        <MagicInput label="Floor / Access Details" field="floor" value={activeCall['floor' as keyof typeof activeCall]} placeholder="3rd Floor, Code 1234..." {...commonInputProps} />
+                        <MagicInput label="Floor / Access Details" field="floor" value={activeCall['floor' as keyof typeof activeCall]} placeholder="3rd Floor, Code 1234..." onHoverField="details" {...commonInputProps} />
                     </div>
                 </div>
 
                 {/* --- SECTION 4: CLASSIFICATION ENGINE --- */}
                 <div className="bg-surface/50 rounded-xl border border-white/5 p-4 overflow-visible relative">
-                    <h3 className="text-xs font-bold text-textMuted uppercase mb-3 flex items-center gap-2 border-b border-white/5 pb-2">
-                        <Tag className="w-3.5 h-3.5" /> Context & Classification
+                    <h3 className="text-xs font-bold text-textMuted uppercase mb-3 flex items-center justify-between border-b border-white/5 pb-2 relative">
+                        <div className="flex items-center gap-2">
+                            <Tag className="w-3.5 h-3.5" /> Context & Classification
+                        </div>
+                        {(aiFilledFields.keyFacts || aiFilledFields.code) && (
+                            <div className="absolute -top-1 right-0">
+                                <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30 flex items-center gap-1 shadow-sm animate-in zoom-in duration-300">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI-Sourced
+                                </span>
+                            </div>
+                        )}
                     </h3>
 
                     <div className="space-y-4">
                         {/* 1. KEYWORDS ROW (Full Width Box with + Add) */}
                         <div
-                            className="bg-surface/30 border border-white/10 rounded-lg p-2 min-h-[44px] flex flex-wrap items-center gap-2 relative group hover:border-white/20 transition-colors"
+                            className={cn(
+                                "bg-surface/30 border border-white/10 rounded-lg p-2 min-h-[44px] flex flex-wrap items-center gap-2 relative group hover:border-white/20 transition-colors",
+                                aiFilledFields.keyFacts && "border-purple-500/50 bg-purple-500/5 ring-1 ring-purple-500/30"
+                            )}
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
@@ -369,7 +377,10 @@ export const IntakeForm: React.FC = () => {
                                 className="flex-1 bg-transparent border-none outline-none text-sm text-white min-w-[100px] placeholder:text-stone-600 placeholder:italic h-full py-1"
                                 placeholder={keyFacts.length === 0 ? "Key words..." : ""}
                                 value={tagInput}
-                                onChange={e => setTagInput(e.target.value)}
+                                onChange={e => {
+                                    setTagInput(e.target.value);
+                                    setAiFilledFields(prev => ({ ...prev, keyFacts: false }));
+                                }}
                                 onKeyDown={e => {
                                     if (e.key === 'Enter') {
                                         e.preventDefault();

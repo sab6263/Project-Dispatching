@@ -11,20 +11,27 @@ interface AddUnitModalProps {
 export const AddUnitModal: React.FC<AddUnitModalProps> = ({ isOpen, onClose }) => {
     const { units, dispatchProposalUnits, addToDispatchProposal } = useCAD();
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'EMS' | 'Fire'>('ALL');
 
     const filteredUnits = useMemo(() => {
-        return units.filter(unit =>
-            unit.callSign.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            unit.type.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [units, searchTerm]);
+        return units.filter(unit => {
+            const matchesSearch = unit.callSign.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                unit.type.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = selectedCategory === 'ALL' || unit.category === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [units, searchTerm, selectedCategory]);
 
     const groupedUnits = useMemo(() => {
-        return {
-            EMS: filteredUnits.filter(u => u.category === 'EMS'),
-            Fire: filteredUnits.filter(u => u.category === 'Fire')
-        };
-    }, [filteredUnits]);
+        const groups: Record<string, Unit[]> = {};
+        if (selectedCategory === 'ALL' || selectedCategory === 'EMS') {
+            groups.EMS = filteredUnits.filter(u => u.category === 'EMS');
+        }
+        if (selectedCategory === 'ALL' || selectedCategory === 'Fire') {
+            groups.Fire = filteredUnits.filter(u => u.category === 'Fire');
+        }
+        return groups;
+    }, [filteredUnits, selectedCategory]);
 
     if (!isOpen) return null;
 
@@ -63,8 +70,24 @@ export const AddUnitModal: React.FC<AddUnitModalProps> = ({ isOpen, onClose }) =
                     </button>
                 </div>
 
-                {/* Search Bar */}
-                <div className="p-4 bg-black/20">
+                {/* Search & Filters */}
+                <div className="p-4 bg-black/20 space-y-4">
+                    <div className="flex gap-2">
+                        {(['ALL', 'EMS', 'Fire'] as const).map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={cn(
+                                    "px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border",
+                                    selectedCategory === cat
+                                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                                        : "bg-white/5 border-white/10 text-textMuted hover:text-white hover:border-white/20"
+                                )}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-textMuted" />
                         <input

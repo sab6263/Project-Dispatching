@@ -33,7 +33,6 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
     const [showConfidenceHelp, setShowConfidenceHelp] = useState(false);
     const [isListening, setIsListening] = useState(true);
     const [isAutoScrollPaused, setIsAutoScrollPaused] = useState(false);
-    const [hasNewMessages, setHasNewMessages] = useState(false);
 
     useEffect(() => {
         // Fluctuate confidence slightly for realism
@@ -60,7 +59,7 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
 
             // If auto-scroll is paused, notify user about new messages
             if (isAutoScrollPaused) {
-                setHasNewMessages(true);
+                // Paused
             }
         }, 2000); // 2 seconds between lines
 
@@ -82,7 +81,6 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
 
             if (isAtBottom) {
                 setIsAutoScrollPaused(false);
-                setHasNewMessages(false);
             } else {
                 setIsAutoScrollPaused(true);
             }
@@ -91,7 +89,6 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
 
     const resumeAutoScroll = () => {
         setIsAutoScrollPaused(false);
-        setHasNewMessages(false);
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
@@ -149,9 +146,14 @@ export const LiveTranscript: React.FC<LiveTranscriptProps> = ({ onToggleCollapse
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, match, entity.type)}
                                 className={cn(
-                                    "inline-flex items-center gap-1 mx-1 px-1.5 py-0.5 rounded cursor-grab active:cursor-grabbing transition-all hover:scale-105 border font-sans", // Reset font for badges? Or keep mono? Keeping Badge distinct.
+                                    "inline-flex items-center gap-1 mx-1 px-1.5 py-0.5 rounded cursor-grab active:cursor-grabbing transition-all hover:scale-105 border font-sans",
                                     getCategoryStyles(entity.category),
-                                    activeTranscriptHighlight === entity.type && "ring-2 ring-yellow-400 scale-110 z-10"
+                                    activeTranscriptHighlight === entity.type && (
+                                        entity.category === 'Caller' ? "ring-1 ring-blue-500 border-blue-400" :
+                                            entity.category === 'Location' ? "ring-1 ring-orange-500 border-orange-400" :
+                                                entity.category === 'Classification' ? "ring-1 ring-purple-500 border-purple-400" :
+                                                    "ring-1 ring-yellow-400"
+                                    )
                                 )}
                                 title={`Category: ${entity.category}`}
                             >

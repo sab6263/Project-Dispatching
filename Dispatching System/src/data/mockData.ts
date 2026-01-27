@@ -80,7 +80,7 @@ export const STATIONS: Station[] = [
         type: 'Station',
         category: 'Fire',
         position: [48.758, 11.433],
-        address: 'Dreizehnerstra├ƒe 1, 85049 Ingolstadt',
+        address: 'Dreizehnerstraße 1, 85049 Ingolstadt',
         mockRouting: { duration: 4, baseTime: 3, trafficDelay: 1, confidence: 87 }
     },
     {
@@ -89,7 +89,7 @@ export const STATIONS: Station[] = [
         type: 'Station',
         category: 'Fire',
         position: [48.783, 11.414],
-        address: '85057 Ingolstadt, Audi-Werksgel├ñnde',
+        address: '85057 Ingolstadt, Audi-Werksgelände',
         mockRouting: { duration: 6, baseTime: 5, trafficDelay: 1, confidence: 82 }
     },
     // --- Rettungswachen (BRK / Partner) ---
@@ -104,11 +104,11 @@ export const STATIONS: Station[] = [
     },
     {
         id: 's27',
-        name: 'Rettungswache Ingolstadt S├╝d',
+        name: 'Rettungswache Ingolstadt Süd',
         type: 'Station',
         category: 'EMS',
         position: [48.729, 11.428],
-        address: 'Hanslmairstra├ƒe 6, 85051 Ingolstadt',
+        address: 'Hanslmairstraße 6, 85051 Ingolstadt',
         mockRouting: { duration: 8, baseTime: 7, trafficDelay: 1, confidence: 84 }
     },
     {
@@ -116,8 +116,8 @@ export const STATIONS: Station[] = [
         name: 'BRK Rettungswache Klinikum',
         type: 'Station',
         category: 'EMS',
-        position: [48.775, 11.402], // Levelingstra├ƒe/Klinikum
-        address: 'Levelingstra├ƒe 21, 85049 Ingolstadt',
+        position: [48.775, 11.402], // Levelingstraße/Klinikum
+        address: 'Levelingstraße 21, 85049 Ingolstadt',
         mockRouting: { duration: 5, baseTime: 4, trafficDelay: 1, confidence: 88 }
     },
     {
@@ -135,7 +135,7 @@ export const STATIONS: Station[] = [
         type: 'Station',
         category: 'EMS',
         position: [48.760, 11.450], // Generic centralized location for logistics
-        address: 'Marie-Curie-Stra├ƒe 18',
+        address: 'Marie-Curie-Straße 18',
         mockRouting: { duration: 7, baseTime: 6, trafficDelay: 1, confidence: 83 }
     },
     {
@@ -151,7 +151,7 @@ export const STATIONS: Station[] = [
     { id: 's13', name: 'FF IN-Stadtmitte', type: 'Station', category: 'Fire', position: [48.765, 11.424], address: 'Innenstadt', mockRouting: { duration: 3, baseTime: 2, trafficDelay: 1, confidence: 94 } },
     { id: 's16', name: 'FF Ingolstadt-Friedrichshofen', type: 'Station', category: 'Fire', position: [48.780, 11.380], address: 'Friedrichshofen', mockRouting: { duration: 9, baseTime: 8, trafficDelay: 1, confidence: 81 } },
     { id: 's15', name: 'FF Ingolstadt-Ringsee / Kothau', type: 'Station', category: 'Fire', position: [48.750, 11.450], address: 'Ringsee', mockRouting: { duration: 7, baseTime: 6, trafficDelay: 1, confidence: 84 } },
-    { id: 's14', name: 'FF Ingolstadt-Haunw├Âhr', type: 'Station', category: 'Fire', position: [48.745, 11.410], address: 'Haunw├Âhr', mockRouting: { duration: 7, baseTime: 6, trafficDelay: 1, confidence: 85 } },
+    { id: 's14', name: 'FF Ingolstadt-Haunwöhr', type: 'Station', category: 'Fire', position: [48.745, 11.410], address: 'Haunwöhr', mockRouting: { duration: 7, baseTime: 6, trafficDelay: 1, confidence: 85 } },
     { id: 's17', name: 'FF Ingolstadt Mailing-Feldkirchen', type: 'Station', category: 'Fire', position: [48.770, 11.480], address: 'Mailing-Feldkirchen', mockRouting: { duration: 9, baseTime: 8, trafficDelay: 1, confidence: 80 } },
     { id: 's40', name: 'FF Ingolstadt-Hagau', type: 'Station', category: 'Fire', position: [48.720, 11.370], address: 'Hagau', mockRouting: { duration: 12, baseTime: 10, trafficDelay: 2, confidence: 76 } },
     { id: 's20', name: 'FF Ingolstadt-Gerolfing', type: 'Station', category: 'Fire', position: [48.770, 11.350], address: 'Gerolfing', mockRouting: { duration: 11, baseTime: 9, trafficDelay: 2, confidence: 78 } },
@@ -162,24 +162,24 @@ export const STATIONS: Station[] = [
     { id: 's39', name: 'Feuerwehr Brunnenreuth', type: 'Station', category: 'Fire', position: [48.720, 11.410], address: 'Brunnenreuth', mockRouting: { duration: 11, baseTime: 10, trafficDelay: 1, confidence: 77 } },
     { id: 's36', name: 'FF IN-Hundszell', type: 'Station', category: 'Fire', position: [48.730, 11.390], address: 'Hundszell', mockRouting: { duration: 10, baseTime: 9, trafficDelay: 1, confidence: 78 } },
     { id: 's38', name: 'FF IN-Unsernherrn', type: 'Station', category: 'Fire', position: [48.730, 11.430], address: 'Unsernherrn', mockRouting: { duration: 9, baseTime: 8, trafficDelay: 1, confidence: 80 } },
-    { id: 's41', name: 'FF IN-D├╝nzlau', type: 'Station', category: 'Fire', position: [48.780, 11.320], address: 'D├╝nzlau', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 73 } },
-    { id: 's42', name: 'FF IN-M├╝hlhausen', type: 'Station', category: 'Fire', position: [48.790, 11.340], address: 'M├╝hlhausen', mockRouting: { duration: 13, baseTime: 11, trafficDelay: 2, confidence: 75 } },
+    { id: 's41', name: 'FF IN-Dünzlau', type: 'Station', category: 'Fire', position: [48.780, 11.320], address: 'Dünzlau', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 73 } },
+    { id: 's42', name: 'FF IN-Mühlhausen', type: 'Station', category: 'Fire', position: [48.790, 11.340], address: 'Mühlhausen', mockRouting: { duration: 13, baseTime: 11, trafficDelay: 2, confidence: 75 } },
     { id: 's43', name: 'FF IN-Pettenhofen', type: 'Station', category: 'Fire', position: [48.795, 11.330], address: 'Pettenhofen', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 72 } },
     // --- Umland / Nachbarorte ---
     { id: 's4', name: 'FF Gaimersheim', type: 'Station', category: 'Fire', position: [48.813, 11.370], address: 'Gaimersheim', mockRouting: { duration: 10, baseTime: 8, trafficDelay: 2, confidence: 79 } },
     { id: 's5', name: 'FF Manching', type: 'Station', category: 'Fire', position: [48.718, 11.493], address: 'Manching', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 75 } },
-    { id: 's6', name: 'Rettungswache K├Âsching', type: 'Station', category: 'EMS', position: [48.810, 11.500], address: 'K├Âpferweg 1', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 74 } },
-    { id: 's7', name: 'FF Eichst├ñtt', type: 'Station', category: 'Fire', position: [48.891, 11.184], address: 'Eichst├ñtt', mockRouting: { duration: 26, baseTime: 23, trafficDelay: 3, confidence: 60 } },
+    { id: 's6', name: 'Rettungswache Kösching', type: 'Station', category: 'EMS', position: [48.810, 11.500], address: 'Köpferweg 1', mockRouting: { duration: 14, baseTime: 12, trafficDelay: 2, confidence: 74 } },
+    { id: 's7', name: 'FF Eichstätt', type: 'Station', category: 'Fire', position: [48.891, 11.184], address: 'Eichstätt', mockRouting: { duration: 26, baseTime: 23, trafficDelay: 3, confidence: 60 } },
     { id: 's8', name: 'FF Geisenfeld', type: 'Station', category: 'Fire', position: [48.684, 11.611], address: 'Geisenfeld', mockRouting: { duration: 22, baseTime: 19, trafficDelay: 3, confidence: 65 } },
     { id: 's29', name: 'RW Geisenfeld', type: 'Station', category: 'EMS', position: [48.684, 11.611], address: 'Geisenfeld', mockRouting: { duration: 22, baseTime: 19, trafficDelay: 3, confidence: 65 } },
-    { id: 's30', name: 'RW Eichst├ñtt', type: 'Station', category: 'EMS', position: [48.891, 11.184], address: 'Eichst├ñtt', mockRouting: { duration: 26, baseTime: 23, trafficDelay: 3, confidence: 60 } },
+    { id: 's30', name: 'RW Eichstätt', type: 'Station', category: 'EMS', position: [48.891, 11.184], address: 'Eichstätt', mockRouting: { duration: 26, baseTime: 23, trafficDelay: 3, confidence: 60 } },
     { id: 's31', name: 'RW Neuburg', type: 'Station', category: 'EMS', position: [48.730, 11.180], address: 'Neuburg', mockRouting: { duration: 24, baseTime: 21, trafficDelay: 3, confidence: 62 } },
     { id: 's34', name: 'MHD Ingolstadt', type: 'Station', category: 'EMS', position: [48.780, 11.440], address: 'Malteser', mockRouting: { duration: 5, baseTime: 4, trafficDelay: 1, confidence: 85 } },
     { id: 's35', name: 'JUH Ingolstadt', type: 'Station', category: 'EMS', position: [48.750, 11.410], address: 'Johanniter', mockRouting: { duration: 6, baseTime: 5, trafficDelay: 1, confidence: 84 } },
     { id: 's9', name: 'FF Vohburg', type: 'Station', category: 'Fire', position: [48.769, 11.618], address: 'Vohburg', mockRouting: { duration: 20, baseTime: 18, trafficDelay: 2, confidence: 66 } },
     { id: 's10', name: 'FF Lenting', type: 'Station', category: 'Fire', position: [48.799, 11.459], address: 'Lenting', mockRouting: { duration: 7, baseTime: 6, trafficDelay: 1, confidence: 88 } },
     { id: 's12', name: 'FF Reichertshofen', type: 'Station', category: 'Fire', position: [48.658, 11.470], address: 'Reichertshofen', mockRouting: { duration: 20, baseTime: 17, trafficDelay: 3, confidence: 67 } },
-    { id: 's21', name: 'FF Gro├ƒmehring', type: 'Station', category: 'Fire', position: [48.760, 11.530], address: 'Gro├ƒmehring', mockRouting: { duration: 13, baseTime: 11, trafficDelay: 2, confidence: 73 } },
+    { id: 's21', name: 'FF Großmehring', type: 'Station', category: 'Fire', position: [48.760, 11.530], address: 'Großmehring', mockRouting: { duration: 13, baseTime: 11, trafficDelay: 2, confidence: 73 } },
     { id: 's22', name: 'FF Wettstetten', type: 'Station', category: 'Fire', position: [48.830, 11.410], address: 'Wettstetten', mockRouting: { duration: 11, baseTime: 9, trafficDelay: 2, confidence: 78 } },
     { id: 's23', name: 'FF Hepberg', type: 'Station', category: 'Fire', position: [48.820, 11.460], address: 'Hepberg', mockRouting: { duration: 10, baseTime: 9, trafficDelay: 1, confidence: 79 } }
 ];
@@ -191,10 +191,11 @@ export const HOSPITALS: Hospital[] = [
         type: 'Hospital',
         position: [48.7753, 11.4047],
         bedsTotal: 1150,
-        bedsAvailable: 154,
+        bedsAvailable: 650, // ~43% occupancy - GREEN
         emergencyAvailable: true,
         traumaCenter: true,
-        address: 'Krumenauerstra├ƒe 25, 85049 Ingolstadt'
+        address: 'Krumenauerstraße 25, 85049 Ingolstadt',
+        admissions: 3 // Low admissions, 43% occupancy
     },
     {
         id: 'h6',
@@ -202,10 +203,11 @@ export const HOSPITALS: Hospital[] = [
         type: 'Hospital',
         position: [48.7753, 11.4047],
         bedsTotal: 10,
-        bedsAvailable: 8,
+        bedsAvailable: 0,
         emergencyAvailable: false,
         traumaCenter: false,
-        address: 'Krumenauerstra├ƒe 25 (am Klinikum)'
+        address: 'Krumenauerstraße 25 (am Klinikum)',
+        admissions: 1 // Recently closed, but had 1 admission before closing in the last hour
     },
     {
         id: 'h3',
@@ -213,10 +215,11 @@ export const HOSPITALS: Hospital[] = [
         type: 'Hospital',
         position: [48.768, 11.423],
         bedsTotal: 80,
-        bedsAvailable: 12,
+        bedsAvailable: 35, // ~56% occupancy - GREEN
         emergencyAvailable: true,
         traumaCenter: false,
-        address: 'Am Nordbahnhof 15, 85049 Ingolstadt'
+        address: 'Am Nordbahnhof 15, 85049 Ingolstadt',
+        admissions: 2 // Low admissions, 56% occupancy
     },
     {
         id: 'h7',
@@ -231,14 +234,15 @@ export const HOSPITALS: Hospital[] = [
     },
     {
         id: 'h2',
-        name: 'Klinik K├Âsching',
+        name: 'Klinik Kösching',
         type: 'Hospital',
         position: [48.8085, 11.4988],
         bedsTotal: 180,
-        bedsAvailable: 45,
+        bedsAvailable: 90, // 50% occupancy - GREEN
         emergencyAvailable: true,
         traumaCenter: false,
-        address: 'Krankenhausstra├ƒe 19, 85092 K├Âsching'
+        address: 'Krankenhausstraße 19, 85092 Kösching',
+        admissions: 2 // Low admissions, 50% occupancy
     },
     {
         id: 'h4',
@@ -246,10 +250,11 @@ export const HOSPITALS: Hospital[] = [
         type: 'Hospital',
         position: [48.7368, 11.1798],
         bedsTotal: 320,
-        bedsAvailable: 68,
+        bedsAvailable: 240, // 25% occupancy - GREEN
         emergencyAvailable: true,
         traumaCenter: true,
-        address: 'M├╝ller-Gnadenegg-Weg 4, 86633 Neuburg'
+        address: 'Müller-Gnadenegg-Weg 4, 86633 Neuburg',
+        admissions: 1 // Very low admissions, 25% occupancy
     },
     {
         id: 'h5',
@@ -257,10 +262,11 @@ export const HOSPITALS: Hospital[] = [
         type: 'Hospital',
         position: [48.7635, 11.4245],
         bedsTotal: 120,
-        bedsAvailable: 24,
-        emergencyAvailable: false,
+        bedsAvailable: 25, // ~79% occupancy - ORANGE
+        emergencyAvailable: true,
         traumaCenter: false,
-        address: 'Preysingstra├ƒe 1-3, 85049 Ingolstadt'
+        address: 'Preysingstraße 1-3, 85049 Ingolstadt',
+        admissions: 5 // High admissions, 79% occupancy (ORANGE)
     }
 ];
 

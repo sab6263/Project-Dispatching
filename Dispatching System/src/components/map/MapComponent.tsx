@@ -5,7 +5,8 @@ import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Building2, Plus } from 'lucide-react';
+import { Building2 } from 'lucide-react';
+import { cn } from '../../lib/utils';
 import type { Hospital, Vehicle, Incident, Station } from '../../data/mockData';
 
 // Fix Leaflet Default Icon
@@ -37,7 +38,7 @@ interface MapComponentProps {
     setRouteMetrics: (metrics: RouteMetrics | null) => void;
 }
 
-const GetIcon = (type: string, category?: string, label?: string) => {
+const GetIcon = (type: string, category?: string, label?: string, extra?: { emergencyAvailable?: boolean; bedsAvailable?: number; bedsTotal?: number }) => {
     let content;
     let bgColor = '#334155';
     let pulse = false;
@@ -48,41 +49,104 @@ const GetIcon = (type: string, category?: string, label?: string) => {
     let borderWidth = '3px';
 
     if (type === 'Hospital') {
-        bgColor = '#ef4444';
-        borderColor = 'rgba(255, 255, 255, 0.8)';
-        textColor = 'rgba(255, 255, 255, 0.9)';
-        borderRadius = '8px';
+        const isClosed = extra?.emergencyAvailable === false;
+        const occupancy = extra ? (1 - (extra.bedsAvailable || 0) / (extra.bedsTotal || 1)) : 0;
+
+        // Grey background like stations, white cross, status shown via border color
+        bgColor = '#475569'; // Same grey as stations
+        textColor = 'white'; // White cross icon
+
+        // Border color based on occupancy thresholds
+        // Green: <70% occupancy (plenty of beds)
+        // Orange: 70-94% occupancy (getting busy)
+        // Red: ≥95% occupancy (critical/full) OR ER is closed
+        if (isClosed || occupancy >= 0.95) {
+            borderColor = '#ef4444'; // Red for critical occupancy or closed ER
+        } else if (occupancy >= 0.70) {
+            borderColor = '#ff9500'; // Vibrant orange for high occupancy
+        } else {
+            borderColor = '#22c55e'; // Green for low occupancy
+        }
+
+        borderRadius = '6px'; // Rounded corners like transcript badges
         size = 40;
         borderWidth = '2px';
-        content = <Plus size={22} strokeWidth={4} />;
+
+        content = (
+            <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                {/* Base cross/plus icon */}
+                <div style={{
+                    position: 'relative',
+                    width: '16px',
+                    height: '16px',
+                    opacity: isClosed ? 0.6 : 1
+                }}>
+                    {/* Vertical bar */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '0',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '4px',
+                        height: '100%',
+                        backgroundColor: textColor,
+                        borderRadius: '2px'
+                    }} />
+                    {/* Horizontal bar */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '0',
+                        transform: 'translateY(-50%)',
+                        width: '100%',
+                        height: '4px',
+                        backgroundColor: textColor,
+                        borderRadius: '2px'
+                    }} />
+                </div>
+            </div>
+        );
     } else if (type === 'Station') {
-        bgColor = '#475569';
-        borderColor = 'rgba(255, 255, 255, 0.8)';
-        textColor = 'rgba(255, 255, 255, 0.9)';
-        borderRadius = '8px';
+        bgColor = '#475569'; // Solid background
+        borderColor = '#64748b';
+        textColor = 'white';
+        borderRadius = '6px'; // Rounded corners
         size = 40;
         borderWidth = '2px';
-        content = <Building2 size={22} strokeWidth={2} />;
+        content = <Building2 size={20} strokeWidth={2} style={{ color: textColor }} />;
     } else if (type === 'Vehicle') {
         const text = label || '?';
+        borderRadius = '50%'; // Vehicles stay circular
+        size = 40;
+        borderWidth = '0px'; // No borders on any vehicles
+
         content = <div style={{
             fontWeight: '800',
-            fontSize: text.length > 3 ? '10px' : '12px',
+            fontSize: text.length > 3 ? '9px' : '11px',
             lineHeight: '1.1',
             textAlign: 'center',
             width: '100%',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            letterSpacing: '-0.02em'
         }}>
             {text}
         </div>;
 
         if (category === 'Fire') {
-            bgColor = '#ef4444';
+            bgColor = '#dc2626'; // Red for fire vehicles
+            textColor = 'white';
         } else {
-            bgColor = '#eab308';
-            textColor = '#3f3f46';
+            bgColor = '#ff9500'; // Vibrant orange for EMS vehicles (matches hospital orange border)
+            textColor = 'white';
         }
     } else if (type === 'Incident') {
         content = null;
@@ -299,10 +363,25 @@ export const MapComponent: React.FC<MapComponentProps> = ({ hospitals, vehicles,
                     <Marker
                         key={h.id}
                         position={h.position}
-                        icon={GetIcon('Hospital')}
+                        icon={GetIcon('Hospital', undefined, undefined, {
+                            emergencyAvailable: h.emergencyAvailable,
+                            bedsAvailable: h.bedsAvailable,
+                            bedsTotal: h.bedsTotal
+                        })}
                         eventHandlers={{ click: () => onSelect(h) }}
                     >
-                        <Tooltip direction="top" offset={[0, -20]} opacity={1}>{h.name}</Tooltip>
+                        <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                            <div className="text-xs">
+                                <div className="font-bold">{h.name}</div>
+                                <div className="mt-1 flex items-center gap-2">
+                                    <span className={cn(
+                                        "w-2 h-2 rounded-full",
+                                        h.emergencyAvailable ? "bg-green-500" : "bg-red-500"
+                                    )} />
+                                    <span>ER: {h.emergencyAvailable ? 'Open' : 'Closed'}</span>
+                                </div>
+                            </div>
+                        </Tooltip>
                     </Marker>
                 ))}
 
